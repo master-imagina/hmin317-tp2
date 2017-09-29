@@ -56,14 +56,19 @@
 
 #include <iostream>
 
-MainWidget::MainWidget(QWidget *parent) :
+float MainWidget::speedRate = 1.0f;
+int MainWidget::maxFrameRate = 0;
+QQuaternion MainWidget::rotation;
+
+MainWidget::MainWidget(QWidget *parent, int frameRate) :
+    frameRate(frameRate),
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(0),
     position(0.0, 0.0, -5.0)
 {
-    
+    if (maxFrameRate < frameRate)
+        maxFrameRate = frameRate;
 }
 
 MainWidget::~MainWidget()
@@ -97,33 +102,16 @@ void MainWidget::wheelEvent(QWheelEvent *e) {
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 0.02 * this->elapsedTimer.elapsed()) * rotationLoop;
+    if (maxFrameRate == frameRate)
+        rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 0.02 * this->elapsedTimer.elapsed() * speedRate) * rotation;
 
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
-
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-    }
-
-    const float speed = 0.003;
     for (unsigned int i = 0, sz = this->key_pressed.size(); i < sz; i++) {
         switch (this->key_pressed[i]) {
         case Qt::Key_Up:
-            this->position.setY(this->position.y() - speed * this->elapsedTimer.elapsed());
+            speedRate *= pow(1.001, this->elapsedTimer.elapsed());
             break;
         case Qt::Key_Down:
-            this->position.setY(this->position.y() + speed * this->elapsedTimer.elapsed());
-            break;
-        case Qt::Key_Left:
-            this->position.setX(this->position.x() + speed * this->elapsedTimer.elapsed());
-            break;
-        case Qt::Key_Right:
-            this->position.setX(this->position.x() - speed * this->elapsedTimer.elapsed());
+            speedRate *= pow(0.999, this->elapsedTimer.elapsed());
             break;
         }
     }
@@ -153,7 +141,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000 / frameRate, this);
 
     this->elapsedTimer.start();
 }
@@ -226,8 +214,8 @@ void MainWidget::paintGL()
     QMatrix4x4 matrix;
     matrix.translate(position);
     matrix.rotate(QQuaternion::fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), -45.0));
-    matrix.rotate(rotationLoop);
     matrix.rotate(rotation);
+    //matrix.rotate(rotation);
 
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);

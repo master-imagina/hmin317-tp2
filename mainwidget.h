@@ -72,7 +72,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(QWidget *parent = 0, int frameRate = 60);
     ~MainWidget();
 
 protected:
@@ -89,6 +89,10 @@ protected:
     void initTextures();
 
 private:
+    const int frameRate;
+    static int maxFrameRate;
+    static float speedRate;
+
     QBasicTimer timer;
     QElapsedTimer elapsedTimer;
 
@@ -101,11 +105,7 @@ private:
 
     QMatrix4x4 projection;
 
-    QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed;
-    QQuaternion rotation;
-    QQuaternion rotationLoop;
+    static QQuaternion rotation;
     QVector3D position;
 };
 

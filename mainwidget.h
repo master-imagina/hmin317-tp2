@@ -70,11 +70,14 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
     explicit MainWidget(QWidget *parent = 0);
+    MainWidget(QWidget *parent, int fps);
     ~MainWidget();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
     void timerEvent(QTimerEvent *e) override;
 
     void initializeGL() override;
@@ -97,6 +100,7 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    int fps;
 };
 
 #endif // MAINWIDGET_H

@@ -52,6 +52,7 @@
 #define MAINWIDGET_H
 
 #include "geometryengine.h"
+#include "camera.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -61,6 +62,7 @@
 #include <QBasicTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+
 
 class GeometryEngine;
 
@@ -75,7 +77,10 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void wheelEvent(QWheelEvent *event) override;
     void timerEvent(QTimerEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -89,14 +94,18 @@ private:
     QOpenGLShaderProgram program;
     GeometryEngine *geometries;
 
-    QOpenGLTexture *texture;
+    QOpenGLTexture *height;
+    QOpenGLTexture *rock;
+    QOpenGLTexture *sand;
 
     QMatrix4x4 projection;
-
+    Camera camera;
+    bool orbit;
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    int fov;
 };
 
 #endif // MAINWIDGET_H

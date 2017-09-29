@@ -121,7 +121,7 @@ void MainWidget::wheelEvent(QWheelEvent *e) {
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 1.0) * rotationLoop;
+    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 0.3) * rotationLoop;
 
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;

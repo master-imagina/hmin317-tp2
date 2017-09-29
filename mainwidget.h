@@ -70,6 +70,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
     explicit MainWidget(QWidget *parent = 0);
+    MainWidget(int fps,QWidget *parent = 0);
     ~MainWidget();
 
 protected:
@@ -83,7 +84,10 @@ protected:
 
     void initShaders();
     void initTextures();
-
+    
+    void keyPressEvent(QKeyEvent *event);
+ 	void keyReleaseEvent(QKeyEvent *event);
+ 	
 private:
     QBasicTimer timer;
     QOpenGLShaderProgram program;
@@ -97,6 +101,8 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    
+    int fps;
 };
 
 #endif // MAINWIDGET_H

@@ -210,8 +210,8 @@ void MainWidget::paintGL()
 
     matrix.translate(posx, 0, posy);
 
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
-    matrix.rotate(framing);
+    //QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
+    //matrix.rotate(framing);
 
     matrix.translate(0.0, -1.8, 0.0);
 

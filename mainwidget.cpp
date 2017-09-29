@@ -51,14 +51,26 @@
 #include "mainwidget.h"
 
 #include <QMouseEvent>
-
+#include <QTimer>
 #include <math.h>
+
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(2.0),
+    rotationAxis(0.0,0.0,1.0)
+{
+}
+
+MainWidget::MainWidget(int fps,QWidget *parent) :
+    QOpenGLWidget(parent),
+    geometries(0),
+    texture(0),
+    rotationAxis(0.0,0.0,1.0),
+    angularSpeed(2.0),
+    fps(fps)
 {
 }
 
@@ -71,7 +83,6 @@ MainWidget::~MainWidget()
     delete geometries;
     doneCurrent();
 }
-
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
@@ -82,7 +93,7 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
+    /*QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
 
     // Rotation axis along the z axis
     //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
@@ -95,15 +106,32 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
 
     // Increase angular speed
-    angularSpeed += acc;
+    angularSpeed += acc;*/
 }
 //! [0]
+void MainWidget::keyPressEvent(QKeyEvent *event)
+{
+	switch(event->key()){
+		case(Qt::Key_Down):
+			angularSpeed-=0.5;
+			update();
+			break;
+		case(Qt::Key_Up):
+			angularSpeed+=0.5;
+			update();
+			break;			
+	}
+}
 
+void MainWidget::keyReleaseEvent(QKeyEvent *event)
+{
+	
+}
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
     // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
+    /*angularSpeed *= 0.99;
 
     // Stop rotation when speed goes below threshold
     if (angularSpeed < 0.01) {
@@ -114,7 +142,9 @@ void MainWidget::timerEvent(QTimerEvent *)
 
         // Request an update
         update();
-    }
+    }*/
+    rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+    update();
 }
 //! [1]
 
@@ -138,7 +168,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000/fps,this);
 }
 
 //! [3]
@@ -166,7 +196,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-1.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -187,7 +217,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 10.0, fov = 30.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -210,10 +240,10 @@ void MainWidget::paintGL()
 
     matrix.translate(0.0, 0.0, -5.0);
 
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
+    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45);
     matrix.rotate(framing);
 
-    matrix.translate(0.0, -1.8, 0.0);
+    matrix.translate(0.0, 0.0, 0.0);
 
     // QVector3D eye = QVector3D(0.0,0.5,-5.0);
     // QVector3D center = QVector3D(0.0,0.0,2.0);

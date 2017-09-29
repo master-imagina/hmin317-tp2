@@ -14,7 +14,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIC -std=c++11 $(DEFINES)
+CXXFLAGS      = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64
 QMAKE         = /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 DEL_FILE      = rm -f
@@ -33,7 +33,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = plane1.0.0
-DISTDIR = /auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/.tmp/plane1.0.0
+DISTDIR = /auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/.tmp/plane1.0.0
 LINK          = g++
 LFLAGS        = -m64 -Wl,-O1
 LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lQt5Widgets -lQt5Gui -lQt5Core -lGL -lpthread 
@@ -320,6 +320,8 @@ qrc_shaders.cpp: shaders.qrc \
 	/usr/lib/x86_64-linux-gnu/qt5/bin/rcc -name shaders shaders.qrc -o qrc_shaders.cpp
 
 qrc_textures.cpp: textures.qrc \
+		heightmap-3.png \
+		heightmap-2.png \
 		cube.png \
 		heightmap-1.png
 	/usr/lib/x86_64-linux-gnu/qt5/bin/rcc -name textures textures.qrc -o qrc_textures.cpp
@@ -329,7 +331,7 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) moc_mainwidget.cpp
 moc_mainwidget.cpp: geometryengine.h \
 		mainwidget.h
-	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwidget.h -o moc_mainwidget.cpp
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwidget.h -o moc_mainwidget.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -368,13 +370,13 @@ moc_mainwidget.o: moc_mainwidget.cpp
 ####### Install
 
 install_target: first FORCE
-	@test -d $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/. || mkdir -p $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/.
-	-$(INSTALL_PROGRAM) $(QMAKE_TARGET) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/$(QMAKE_TARGET)
-	-$(STRIP) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/$(QMAKE_TARGET)
+	@test -d $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/. || mkdir -p $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/.
+	-$(INSTALL_PROGRAM) $(QMAKE_TARGET) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/$(QMAKE_TARGET)
+	-$(STRIP) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/$(QMAKE_TARGET)
 
 uninstall_target: FORCE
-	-$(DEL_FILE) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/$(QMAKE_TARGET)
-	-$(DEL_DIR) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2-master/./ 
+	-$(DEL_FILE) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/$(QMAKE_TARGET)
+	-$(DEL_DIR) $(INSTALL_ROOT)/auto_home/fcarnac/Bureau/Moteur/hmin317-tp2/./ 
 
 
 install: install_target  FORCE

@@ -94,9 +94,9 @@ void GeometryEngine::initPlaneGeometry()
             	int x = img.width() * i/16;
             	int y = img.height() * j/16;
             	QColor col(img.pixel(x,y));
-            	int z = 0.21*col.red() + 0.72*col.green() + 0.07*col.blue();
+            	float z = 0.2126*col.red() + 0.7152*col.green() + 0.0722*col.blue();
                 // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z/100), QVector2D(0.33*i/16.0,0.5*j/16.0)};
+                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z/512.0), QVector2D(i/16.0,j/16.0)};
                 // add height field eg (i-8)*(j-8)/256.0
         }
 

@@ -68,8 +68,8 @@ MainWidget::MainWidget(int fps,QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(20.0/fps),
     rotationAxis(0.0,0.0,1.0),
+    angularSpeed(2.0),
     fps(fps)
 {
 }
@@ -196,7 +196,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/heightmap-1.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-1.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -217,7 +217,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 10.0, fov = 30.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -243,7 +243,7 @@ void MainWidget::paintGL()
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45);
     matrix.rotate(framing);
 
-    matrix.translate(0.0, -1.0, 0.0);
+    matrix.translate(0.0, 0.0, 0.0);
 
     // QVector3D eye = QVector3D(0.0,0.5,-5.0);
     // QVector3D center = QVector3D(0.0,0.0,2.0);

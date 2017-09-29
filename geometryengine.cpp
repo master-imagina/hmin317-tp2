@@ -54,6 +54,7 @@
 #include <QVector3D>
 #include <QImage>
 #include <QColor>
+#include <iostream>
 
 struct VertexData
 {
@@ -95,9 +96,9 @@ void GeometryEngine::initPlaneGeometry()
                 int x = tex.width() * i/16;
                 int y = tex.height() * j/16;
                 QColor col(tex.pixel(x,y));
-                int z = 0.2126 * col.red() + 0.7152 * col.green() + 0.0722 * col.blue();
+                float z = 0.2126 * col.red() + 0.7152 * col.green() + 0.0722 * col.blue();
                 // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z%256 / 100), QVector2D(i/16.0,j/16.0)};
+                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z/512), QVector2D(i/16.0,j/16.0)};
                 // add height field eg (i-8)*(j-8)/256.0
         }
 

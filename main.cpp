@@ -67,8 +67,14 @@ int main(int argc, char *argv[])
     app.setApplicationName("plane");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
+    MainWidget widget(0,1);
     widget.show();
+    MainWidget widget1(0,10);
+    widget1.show();
+    MainWidget widget2(0,100);
+    widget2.show();
+    MainWidget widget3(0,1000);
+    widget3.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();

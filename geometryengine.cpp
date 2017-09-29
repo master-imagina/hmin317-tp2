@@ -89,57 +89,61 @@ void GeometryEngine::initPlaneGeometry()
     float taille_max = 0.5;
     QImage img;
 
-    if(!img.load(":/heightmap-3.png")) {
+    if(!img.load(":/heightmap-1.png")) {
         std::cerr << "ERREUR CHARGEMENT FICHIER HEIGHTMAP." << std::endl;
         return;
     }
 
+    int size = 64;
+
     int height = img.height(), width = img.width();
-    int i_m = height / 16, j_m = width / 16;
+    int i_m = height / size, j_m = width / size;
 
     std::cout << i_m << "," << j_m << std::endl;
 
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
-    VertexData vertices[16*16];
+    VertexData vertices[size*size];
 
-    for (int i=0;i<16;i++)
-        for (int j=0;j<16;j++)
+    for (int i=0;i<size;i++)
+        for (int j=0;j<size;j++)
             {
                 // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max + 1.5), QVector2D(i/16.0,j/16.0)};
+                vertices[size*i+j] = { QVector3D(0.1*(i-(size / 2.0)),0.1*(j-(size / 2.0)), (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max + 1.5), QVector2D((float)i/size,(float)j/size)};
                 // add height field eg (i-8)*(j-8)/256.0
 
-                std::cout << "Position pixel : " << i_m * i << "," << j_m * j << std::endl;
-                std::cout << "Valeur : " <<  qGray(img.pixel(i_m * i, j_m * j)) / 255 * taille_max << std::endl;
+                //std::cout << "Position pixel : " << i_m * i << "," << j_m * j << std::endl;
+                //std::cout << "Valeur : " <<  (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max << std::endl;
         }
 
 
     // Draw 15 bands each with 32 vertices, with repeated vertices at the end of each band
-    GLushort indices[15*36];
+    int nb_vertices = size * 2 + 4;
+    taille_vertices = nb_vertices * (size - 1);
+    GLushort indices[(size - 1) * nb_vertices];
 
-    for (int i=0;i<15;i++)
+    for (int i=0;i<size-1;i++)
         {
-            indices[36*i] = 16*i;
-            indices[36*i+1] = 16*i;
+            indices[nb_vertices*i] = size*i;
+            indices[nb_vertices*i+1] = size*i;
 
-            for (int j=2;j<34;j+=2)
+            for (int j=2;j<nb_vertices;j+=2)
                 {
-                    indices[36*i+j] = 16*i +(j-2)/2;
-                    indices[36*i+j+1] = 16*(i+1) + (j-2)/2;
+                    indices[nb_vertices*i+j] = size*i +(j-2)/2;
+                    indices[nb_vertices*i+j+1] = size*(i+1) + (j-2)/2;
                 }
 
-            indices[36*i+34] = 16*(i+1) + 15;
-            indices[36*i+35] = 16*(i+1) + 15;
+            indices[nb_vertices*i+nb_vertices - 2] = size*(i+1) + size - 1;
+            indices[nb_vertices*i+nb_vertices - 1] = size*(i+1) + size - 1;
     }
 
 //! [1]
     // Transfer vertex data to VBO 0
     arrayBuf.bind();
-    arrayBuf.allocate(vertices, 16*16 * sizeof(VertexData));
+    arrayBuf.allocate(vertices, size*size * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
-    indexBuf.allocate(indices, 15*36 * sizeof(GLushort));
+    indexBuf.allocate(indices, (size - 1) * nb_vertices * sizeof(GLushort));
 //! [1]
 }
 
@@ -238,6 +242,6 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw plane geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 15*36, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, taille_vertices, GL_UNSIGNED_SHORT, 0);
 }
 //! [2]

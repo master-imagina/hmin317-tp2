@@ -166,7 +166,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/heightmap-3.png"));
+    texture = new QOpenGLTexture(QImage(":/heightmap-1.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -208,7 +208,7 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(0.0, 0.0, -10.0);
 
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
     matrix.rotate(framing);

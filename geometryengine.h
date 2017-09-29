@@ -65,6 +65,7 @@ public:
 
 private:
     void initPlaneGeometry();
+    int taille_vertices;
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;

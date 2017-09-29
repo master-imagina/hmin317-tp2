@@ -86,7 +86,7 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 
     // Rotation axis along the z axis
     //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+    QVector3D n = QVector3D(0.0,0.0,diff.x()).normalized();
 
     // Accelerate angular speed relative to the length of the mouse sweep
     qreal acc = diff.length() / 100.0;
@@ -208,7 +208,7 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(posx, 0, posy);
 
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
     matrix.rotate(framing);
@@ -231,4 +231,19 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     geometries->drawPlaneGeometry(&program);
+}
+
+void MainWidget::keyPressEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key_Escape)
+        std::exit(0);
+
+    //Reception des inputs
+    float _x = (float)(e->key() == Qt::Key_Right || e->key() == Qt::Key_D) - (float)(e->key() == Qt::Key_Left || e->key() == Qt::Key_Q);
+    float _y = (float)(e->key() == Qt::Key_Up    || e->key() == Qt::Key_Z) - (float)(e->key() == Qt::Key_Down || e->key() == Qt::Key_S);
+
+    posx += _x/10.f;
+    posy += _y/10.f;
+
+    update(); //Il faut mettre a jour la scene !
+
 }

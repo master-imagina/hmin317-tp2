@@ -68,6 +68,8 @@ private:
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
+    int iWidth;
+    int iHeight;
 };
 
 #endif // GEOMETRYENGINE_H

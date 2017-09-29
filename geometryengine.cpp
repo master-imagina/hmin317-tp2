@@ -52,6 +52,8 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QImage>
+#include <QColor>
 
 struct VertexData
 {
@@ -85,11 +87,17 @@ void GeometryEngine::initPlaneGeometry()
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
     VertexData vertices[16*16];
 
+    QImage tex(":/heightmap-1.png");
+
     for (int i=0;i<16;i++)
         for (int j=0;j<16;j++)
             {
+                int x = tex.width() * i/16;
+                int y = tex.height() * j/16;
+                QColor col(tex.pixel(x,y));
+                int z = 0.2126 * col.red() + 0.7152 * col.green() + 0.0722 * col.blue();
                 // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), 2), QVector2D(0.33*i/16.0,0.5*j/16.0)};
+                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z%256 / 100), QVector2D(i/16.0,j/16.0)};
                 // add height field eg (i-8)*(j-8)/256.0
         }
 

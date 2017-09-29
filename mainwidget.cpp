@@ -63,7 +63,7 @@ MainWidget::MainWidget(QWidget *parent) :
     angularSpeed(0),
     position(0.0, 0.0, -5.0)
 {
-
+    
 }
 
 MainWidget::~MainWidget()
@@ -112,11 +112,17 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     // Increase angular speed
     angularSpeed += acc;
 }
+
+void MainWidget::wheelEvent(QWheelEvent *e) {
+    position.setZ(position.z() * (1 + e->delta() / -1000.0));
+}
 //! [0]
 
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
+    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 1.0) * rotationLoop;
+
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
 
@@ -126,37 +132,28 @@ void MainWidget::timerEvent(QTimerEvent *)
     } else {
         // Update rotation
         rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
-        // Request an update
-        update();
     }
 
     const float speed = 0.003;
-    bool need_update = false;
     for (unsigned int i = 0, sz = this->key_pressed.size(); i < sz; i++) {
         switch (this->key_pressed[i]) {
         case Qt::Key_Up:
             this->position.setY(this->position.y() - speed * this->elapsedTimer.elapsed());
-            update();
             break;
         case Qt::Key_Down:
             this->position.setY(this->position.y() + speed * this->elapsedTimer.elapsed());
-            update();
             break;
         case Qt::Key_Left:
             this->position.setX(this->position.x() + speed * this->elapsedTimer.elapsed());
-            update();
             break;
         case Qt::Key_Right:
             this->position.setX(this->position.x() - speed * this->elapsedTimer.elapsed());
-            update();
             break;
         }
     }
-    if (need_update)
-        update();
 
     this->elapsedTimer.restart();
+    update();
 }
 //! [1]
 
@@ -210,7 +207,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage("heightmap-3.png").mirrored());
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -231,7 +228,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 30.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -252,6 +249,8 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
     matrix.translate(position);
+    matrix.rotate(QQuaternion::fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), -45.0));
+    matrix.rotate(rotationLoop);
     matrix.rotate(rotation);
 
     // Set modelview-projection matrix

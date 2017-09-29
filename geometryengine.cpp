@@ -53,6 +53,8 @@
 #include <QVector2D>
 #include <QVector3D>
 
+#include <iostream>
+
 struct VertexData
 {
     QVector3D position;
@@ -61,7 +63,7 @@ struct VertexData
 
 //! [0]
 GeometryEngine::GeometryEngine()
-    : indexBuf(QOpenGLBuffer::IndexBuffer), indexBufPlane(QOpenGLBuffer::IndexBuffer)
+    : indexBuf(QOpenGLBuffer::IndexBuffer), indexBufPlane(QOpenGLBuffer::IndexBuffer), heightMap("heightmap-3.png")
 {
     initializeOpenGLFunctions();
 
@@ -155,16 +157,25 @@ void GeometryEngine::initCubeGeometry()
 //! [1]
 }
 
+#define I 250
+#define J 250
+
 void GeometryEngine::initPlaneGeometry()
 {
     // For cube we would need only 8 vertices but we have to
     // duplicate vertex for each face because texture coordinate
     // is different.
-    VertexData vertices[16 * 16];
-    for (unsigned int i = 0; i < 16; i++) {
-        for (unsigned int j = 0; j < 16; j++) {
-            vertices[i * 16 + j].position = QVector3D(-1.0f + ((float)i / 8), -1.0f + ((float)j / 8), (float)(rand() % 30) / 120);
-            vertices[i * 16 + j].texCoord = QVector2D((float)i / 15, (float)j / 15);
+    int width = heightMap.width() - 1,
+        height = heightMap.height() - 1;
+
+    VertexData vertices[I * J];
+    for (unsigned int i = 0; i < I; i++) {
+        for (unsigned int j = 0; j < J; j++) {
+            vertices[i * J + j].position = QVector3D(-1.0f + ((float)i / (I / 2)),
+                                                     -1.0f + ((float)j / (J / 2)),
+                                                     (float)(heightMap.pixel((int)(height * i) / (I - 1),
+                                                                             (int)(width * ((J - 1) - j)) / (J - 1)) & 0xff) / 1000.0);
+            vertices[i * J + j].texCoord = QVector2D((float)i / (I - 1), (float)j / (J - 1));
         }
     }
 
@@ -175,36 +186,36 @@ void GeometryEngine::initPlaneGeometry()
     // index of the second strip needs to be duplicated. If
     // connecting strips have same vertex order then only last
     // index of the first strip needs to be duplicated.
-    GLushort indices[15 * 15 * 2 * 3 * 2];
-    for (unsigned int i = 0; i < 15; i++) {
-        for (unsigned int j = 0; j < 15; j++) {
-            indices[i * 15 * 6 + j * 6] = i * 16 + j;
-            indices[i * 15 * 6 + j * 6 + 1] = i * 16 + j + 1;
-            indices[i * 15 * 6 + j * 6 + 2] = (i + 1) * 16 + j;
-            indices[i * 15 * 6 + j * 6 + 3] = (i + 1) * 16 + j;
-            indices[i * 15 * 6 + j * 6 + 4] = i * 16 + j + 1;
-            indices[i * 15 * 6 + j * 6 + 5] = (i + 1) * 16 + j + 1;
+    GLushort indices[(I - 1) * (J - 1) * 2 * 3 * 2];
+    for (unsigned int i = 0; i < (I - 1); i++) {
+        for (unsigned int j = 0; j < (J - 1); j++) {
+            indices[i * (J - 1) * 6 + j * 6] = i * J + j;
+            indices[i * (J - 1) * 6 + j * 6 + 1] = i * J + j + 1;
+            indices[i * (J - 1) * 6 + j * 6 + 2] = (i + 1) * J + j;
+            indices[i * (J - 1) * 6 + j * 6 + 3] = (i + 1) * J + j;
+            indices[i * (J - 1) * 6 + j * 6 + 4] = i * J + j + 1;
+            indices[i * (J - 1) * 6 + j * 6 + 5] = (i + 1) * J + j + 1;
         }
     }
-    for (unsigned int i = 0; i < 15; i++) {
-        for (unsigned int j = 0; j < 15; j++) {
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6] = i * 16 + j + 1;
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6 + 1] = i * 16 + j;
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6 + 2] = (i + 1) * 16 + j;
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6 + 3] = i * 16 + j + 1;
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6 + 4] = (i + 1) * 16 + j;
-            indices[15 * 15 * 2 * 3 + i * 15 * 6 + j * 6 + 5] = (i + 1) * 16 + j + 1;
+    for (unsigned int i = 0; i < (I - 1); i++) {
+        for (unsigned int j = 0; j < (J - 1); j++) {
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6] = i * J + j + 1;
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6 + 1] = i * J + j;
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6 + 2] = (i + 1) * J + j;
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6 + 3] = i * J + j + 1;
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6 + 4] = (i + 1) * J + j;
+            indices[(I - 1) * (J - 1) * 2 * 3 + i * (J - 1) * 6 + j * 6 + 5] = (i + 1) * J + j + 1;
         }
     }
 
 //! [1]
     // Transfer vertex data to VBO 0
     arrayBufPlane.bind();
-    arrayBufPlane.allocate(vertices, 16 * 16 * sizeof(VertexData));
+    arrayBufPlane.allocate(vertices, I * J * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBufPlane.bind();
-    indexBufPlane.allocate(indices, 15 * 15 * 2 * 3 * 2 * sizeof(GLushort));
+    indexBufPlane.allocate(indices, (I - 1) * (J - 1) * 2 * 3 * 2 * sizeof(GLushort));
 //! [1]
 }
 
@@ -259,5 +270,5 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLES, 15 * 15 * 2 * 3 * 2, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, (I - 1) * (J - 1) * 2 * 3 * 2, GL_UNSIGNED_SHORT, 0);
 }

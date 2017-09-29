@@ -1,0 +1,55 @@
+% Document description
+\documentclass[a4paper,11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[francais]{babel}
+\usepackage{listings}
+\usepackage{graphicx} %Pour inclure les images
+\usepackage{float} %Pour plus de précision sur le placement
+\usepackage{color}
+\usepackage[hidelinks]{hyperref} %Pour les liens dans le PDF
+\usepackage{fancyhdr} %En-tête + pieds de page
+\usepackage{lastpage}
+
+% Metadata
+\title{HMIN317 - Moteur de jeux \\ Compte-rendu TP2}
+\author{BOYER Benoît}
+\date{Septembre 2017}
+
+\input{css.tex}
+
+
+% --------------> Document beginning <--------------
+\begin{document}
+
+  	  %Pattern de Peter Wilson
+  	  \begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	
+	  \raggedleft % Right align the title page
+	
+	  \rule{1pt}{\textheight} % Vertical line
+	  \hspace{0.05\textwidth} % Whitespace between the vertical line and title page text
+	  \parbox[b]{0.75\textwidth}{ % Paragraph box for holding the title page text, adjust the width to move the title page left or right on the page
+		
+		  {\Huge\bfseries Compte-rendu TP2 \\[0.5\baselineskip] Game loops et timers}\\[2\baselineskip] % Title
+		  {\large\textit{HMIN317 - Moteur de jeux}}\\[4\baselineskip] % Subtitle or further description
+		  {\Large\textsc{BOYER Benoît}} % Author name, lower case for consistent small caps
+		
+		  \vspace{0.5\textheight} % Whitespace between the title block and the publisher
+		
+		  {\noindent M2 IMAGINA - Septembre 2017}\\[\baselineskip] % Publisher and logo
+	  }
+
+  \end{titlepage}
+  
+    \tableofcontents
+	\pagebreak
+
+
+    \section{Question 1}
+    \subsection{Modifier votre TP précédent pour lire une height map}
+    La classe MainWidget sert à gérer l'affichage et les évènements du programme, en effet si on se fie aux foncions présentes dans le .h :
+    \lstinputlisting[language=C++, caption=Fonctions de la classe MainWidget, firstline=75, lastline=85]{../mainwidget.h}
+    	
+\end{document}

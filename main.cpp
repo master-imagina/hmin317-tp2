@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("plane");
-    app.setApplicationVersion("0.1");
+    app.setApplicationName("TP 2 - Moteurs");
+    app.setApplicationVersion("0.2");
 #ifndef QT_NO_OPENGL
     MainWidget widget;
     widget.show();

@@ -88,30 +88,6 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event) {
         }
     }
 }
-void MainWidget::mousePressEvent(QMouseEvent *e)
-{
-    // Save mouse press position
-    mousePressPosition = QVector2D(e->localPos());
-}
-
-void MainWidget::mouseReleaseEvent(QMouseEvent *e)
-{
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
-
-    // Rotation axis is perpendicular to the mouse position difference
-    // vector
-    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
-
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-
-    // Increase angular speed
-    angularSpeed += acc;
-}
 
 void MainWidget::wheelEvent(QWheelEvent *e) {
     position.setZ(position.z() * (1 + e->delta() / -1000.0));
@@ -121,7 +97,7 @@ void MainWidget::wheelEvent(QWheelEvent *e) {
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 0.3) * rotationLoop;
+    rotationLoop = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), 0.02 * this->elapsedTimer.elapsed()) * rotationLoop;
 
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;

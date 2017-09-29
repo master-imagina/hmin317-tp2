@@ -53,12 +53,15 @@
 
 #include "geometryengine.h"
 
+#include <vector>
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
 #include <QBasicTimer>
+#include <QElapsedTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
@@ -73,6 +76,8 @@ public:
     ~MainWidget();
 
 protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void timerEvent(QTimerEvent *e) override;
@@ -86,6 +91,10 @@ protected:
 
 private:
     QBasicTimer timer;
+    QElapsedTimer elapsedTimer;
+
+    std::vector<int> key_pressed;
+
     QOpenGLShaderProgram program;
     GeometryEngine *geometries;
 
@@ -97,6 +106,7 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    QVector3D position;
 };
 
 #endif // MAINWIDGET_H

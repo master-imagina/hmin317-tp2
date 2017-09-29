@@ -49,7 +49,15 @@
 
     \section{Question 1}
     \subsection{Modifier votre TP précédent pour lire une height map}
-    La classe MainWidget sert à gérer l'affichage et les évènements du programme, en effet si on se fie aux foncions présentes dans le .h :
-    \lstinputlisting[language=C++, caption=Fonctions de la classe MainWidget, firstline=75, lastline=85]{../mainwidget.h}
+    Dans un premier temps, on va devoir charger l'image qui va nous servir de height map dans la fonction \texttt{GeometryEngine::initPlaneGeometry(QWidget *qw)}, auquel on aura rajouté le paramètre \texttt{QWidget *qw} pour avoir des fenêtres.
+    \lstinputlisting[language=C++, caption=Selection de la height map, firstline=132, lastline=139, firstnumber=132]{../geometryengine.cpp}
+    \image{choixHeightmap.png}{La fenêtre de dialogue obtenue}
+    Ensuite, on utilise une \texttt{QImage} qui servira à parcourir l'image pour récupérer la valeur des pixels pour les assigner à une hauteur.
+    
+    \subsection{Afficher un terrain à partir d'une height map}
+    Pour générer le terrain à partir de la height map, il suffit d'appliquer la valeur de la heightmap lors de la génération des vertices :
+        \lstinputlisting[language=C++, caption=Selection de la height map, firstline=146, lastline=151, firstnumber=146]{../geometryengine.cpp}
+	L'élément important étant la valeur y, caractérisée par la fonction \texttt{qGray()}, qui va récupérer un pixel d'une \texttt{QImage}, dans notre cas qui s'appelle heightMap, et qu'on utilise la fonction \texttt{QImage::pixel(x, y)} pour récupérer la valeur d'un pixel en RGB aux coordonnées fournies.\\
+	La fonction \texttt{qGray()} va convertir la valeur en niveaux de gris, et par conséquent donner la hauteur (qui est ici divisée par 50 pour éviter d'avoir des valeurs trop élevées).
     	
 \end{document}

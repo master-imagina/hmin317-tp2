@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(TP2_Moteurs)
+project(TP2_Moteur)
 
 set(CMAKE_CXX_STANDARD 11)
 

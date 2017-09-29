@@ -58,16 +58,18 @@
 class GeometryEngine : protected QOpenGLFunctions
 {
 public:
-    GeometryEngine();
+    GeometryEngine(QWidget* qw);
     virtual ~GeometryEngine();
 
     void drawPlaneGeometry(QOpenGLShaderProgram *program);
 
 private:
-    void initPlaneGeometry();
+    void initPlaneGeometry(QWidget* qw);
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
+
+    unsigned int tailleIndices;
 };
 
 #endif // GEOMETRYENGINE_H

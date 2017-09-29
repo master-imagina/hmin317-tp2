@@ -135,7 +135,7 @@ void MainWidget::initializeGL()
     glEnable(GL_CULL_FACE);
 //! [2]
 
-    geometries = new GeometryEngine;
+    geometries = new GeometryEngine(parentWidget());
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -187,7 +187,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 100.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();

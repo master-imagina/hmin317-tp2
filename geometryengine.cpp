@@ -53,6 +53,10 @@
 #include <QVector2D>
 #include <QVector3D>
 
+#include <QLabel>
+
+#include <iostream>
+
 struct VertexData
 {
     QVector3D position;
@@ -82,6 +86,19 @@ GeometryEngine::~GeometryEngine()
 
 void GeometryEngine::initPlaneGeometry()
 {
+    float taille_max = 0.5;
+    QImage img;
+
+    if(!img.load(":/heightmap-3.png")) {
+        std::cerr << "ERREUR CHARGEMENT FICHIER HEIGHTMAP." << std::endl;
+        return;
+    }
+
+    int height = img.height(), width = img.width();
+    int i_m = height / 16, j_m = width / 16;
+
+    std::cout << i_m << "," << j_m << std::endl;
+
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
     VertexData vertices[16*16];
 
@@ -89,8 +106,11 @@ void GeometryEngine::initPlaneGeometry()
         for (int j=0;j<16;j++)
             {
                 // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), 2), QVector2D(0.33*i/16.0,0.5*j/16.0)};
+                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max + 1.5), QVector2D(i/16.0,j/16.0)};
                 // add height field eg (i-8)*(j-8)/256.0
+
+                std::cout << "Position pixel : " << i_m * i << "," << j_m * j << std::endl;
+                std::cout << "Valeur : " <<  qGray(img.pixel(i_m * i, j_m * j)) / 255 * taille_max << std::endl;
         }
 
 

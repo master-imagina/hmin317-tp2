@@ -51,10 +51,12 @@
 #include <QApplication>
 #include <QLabel>
 #include <QSurfaceFormat>
+#include <vector>
 
 #ifndef QT_NO_OPENGL
 #include "mainwidget.h"
 #endif
+
 
 int main(int argc, char *argv[])
 {

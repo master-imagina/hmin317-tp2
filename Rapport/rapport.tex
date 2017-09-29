@@ -73,5 +73,9 @@
 		
 		Dans notre cas, nous allons uniquement incliner le terrain avec une matrice de rotation, soit un Quaternion :
 		\lstinputlisting[language=C++, caption=Rotation du terrain, firstline=213, lastline=214, firstnumber=213]{../mainwidget.cpp}
-    	
+		%Ajout screen avant et après inclinaison
+		
+	\subsection{Faire tourner le terrain autour de son origine avec une vitesse constante.}
+		Lorsqu'on fait glisser le terrain avec la souris, on arrive à faire tourner le terrain, avec une décélération progressive, qui est lié à la friction, pour cela, on constate que tout se passe dans \textit{mainwidget.cpp}, dans les fonctions \texttt{paintGL()} pour appliquer le rendu et \texttt{timerEvent(QTimerEvent*)} qui va appliquer la décélération, et donc une action sur un temps constant.    
+    
 \end{document}

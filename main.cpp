@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(format);
 
     auto mw = new MainWindow;
-    mw->setFixedSize(640, 400);
+    mw->setMinimumSize(640, 400);
     mw->show();
 
     return app.exec();

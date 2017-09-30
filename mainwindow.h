@@ -1,10 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <memory>
+
 #include <QMainWindow>
 
 class GameWidget;
-class GeometryEngine;
+class TerrainGeometry;
 
 
 class MainWindow : public QMainWindow
@@ -13,14 +15,14 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-    ~MainWindow() = default;
+    ~MainWindow();
 
 private Q_SLOTS:
     void openLoadHeightMapDialog();
     void loadHeightMap(const QString &filePath);
 
 private:
-    GeometryEngine *m_geometryEngine;
+    std::unique_ptr<TerrainGeometry> m_terrainGeometry;
     GameWidget *m_gameWidget;
 };
 

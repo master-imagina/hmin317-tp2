@@ -1,19 +1,21 @@
-#include "mainwidget.h"
+#include "gamewidget.h"
 
-#include <math.h>
-
+#include <QApplication>
 #include <QMatrix4x4>
 #include <QtMath>
 
 #include "camera.h"
 #include "cameracontroller.h"
+#include "renderer.h"
+#include "terraingeometry.h"
 
 
 GameWidget::GameWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     m_timer(),
     m_shaderProgram(),
-    m_geometryEngine(nullptr),
+    m_geometry(nullptr),
+    m_renderer(nullptr),
     m_texture(nullptr),
     m_camera(std::make_unique<Camera>()),
     m_cameraController(new CameraController(this))
@@ -29,19 +31,33 @@ GameWidget::~GameWidget()
     // Make sure the context is current when deleting the texture
     // and the buffers.
     makeCurrent();
+
     delete m_texture;
-    delete m_geometryEngine;
+    m_renderer->cleanupResources();
+
     doneCurrent();
+}
+
+void GameWidget::setGeometry(TerrainGeometry *geom)
+{
+    if (m_geometry != geom) {
+        m_geometry = geom;
+    }
 }
 
 void GameWidget::timerEvent(QTimerEvent *)
 {
     update();
+
+    //FIXME Implement threaded rendering or avoid file dialogs instead of this
+    qApp->processEvents();
 }
 
 void GameWidget::initializeGL()
 {
     initializeOpenGLFunctions();
+
+    m_renderer = std::make_unique<Renderer>();
 
     glClearColor(0, 0, 0, 1);
 
@@ -51,20 +67,18 @@ void GameWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    m_geometryEngine = new GeometryEngine;
-
     m_timer.start(12, this);
 }
 
 void GameWidget::initShaders()
 {
     if (!m_shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                 ":/geom_textured.vert")) {
+                                                 "://res/shaders/geom_textured.vert")) {
         close();
     }
 
     if (!m_shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                 ":/geom_textured.frag")) {
+                                                 ":/res/shaders/terrain_heightmap.frag")) {
         close();
     }
 
@@ -107,6 +121,10 @@ void GameWidget::paintGL()
                                     projectionMatrix * viewMatrix);
     m_shaderProgram.setUniformValue("texture", 0);
 
+    const std::pair<float, float> heightBounds = m_geometry->heightBounds();
+    m_shaderProgram.setUniformValue("minHeight", heightBounds.first);
+    m_shaderProgram.setUniformValue("maxHeight", heightBounds.second);
+
     // Draw geometry
-    m_geometryEngine->drawTerrainGeometry(&m_shaderProgram);
+    m_renderer->draw(m_geometry, &m_shaderProgram);
 }

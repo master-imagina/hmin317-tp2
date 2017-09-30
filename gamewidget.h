@@ -1,5 +1,5 @@
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#ifndef GAMEWIDGET_H
+#define GAMEWIDGET_H
 
 #include <memory>
 
@@ -11,11 +11,10 @@
 #include <QQuaternion>
 #include <QVector2D>
 
-#include "geometryengine.h"
-
 class Camera;
 class CameraController;
-class GeometryEngine;
+class TerrainGeometry;
+class Renderer;
 
 
 class GameWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -25,6 +24,8 @@ class GameWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit GameWidget(QWidget *parent = 0);
     ~GameWidget();
+
+    void setGeometry(TerrainGeometry *geom);
 
 protected:
     void timerEvent(QTimerEvent *e) override;
@@ -40,7 +41,9 @@ private:
 private:
     QBasicTimer m_timer;
     QOpenGLShaderProgram m_shaderProgram;
-    GeometryEngine *m_geometryEngine;
+
+    TerrainGeometry *m_geometry;
+    std::unique_ptr<Renderer> m_renderer;
 
     QOpenGLTexture *m_texture;
 
@@ -48,4 +51,4 @@ private:
     CameraController *m_cameraController;
 };
 
-#endif // MAINWIDGET_H
+#endif // GAMEWIDGET_H

@@ -5,13 +5,16 @@
 #include <QMenu>
 #include <QMenuBar>
 
-#include "mainwidget.h"
+#include "gamewidget.h"
+#include "terraingeometry.h"
+
 
 MainWindow::MainWindow() :
-    m_geometryEngine(),
+    m_terrainGeometry(std::make_unique<TerrainGeometry>()),
     m_gameWidget(new GameWidget(this))
 {
     m_gameWidget->setFocus();
+    m_gameWidget->setGeometry(m_terrainGeometry.get());
 
     auto menuBar = new QMenuBar(this);
 
@@ -25,6 +28,9 @@ MainWindow::MainWindow() :
     setMenuBar(menuBar);
     setCentralWidget(m_gameWidget);
 }
+
+MainWindow::~MainWindow()
+{}
 
 void MainWindow::openLoadHeightMapDialog()
 {
@@ -64,5 +70,5 @@ void MainWindow::loadHeightMap(const QString &filePath)
         return qGray(heightMap.pixel(x, y));
     });
 
-    m_gameWidget->
+    m_terrainGeometry->loadTerrainData(heights);
 }

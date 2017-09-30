@@ -130,7 +130,7 @@ QMatrix4x4 Camera::projectionMatrix()
 {
     if (m_isProjectionMatrixDirty) {
         m_projectionMatrix.setToIdentity();
-        m_projectionMatrix.perspective(45.f, m_aspectRatio, 1.f, 100.f);
+        m_projectionMatrix.perspective(45.f, m_aspectRatio, 1.f, 10000.f);
 
         m_isProjectionMatrixDirty = false;
     }

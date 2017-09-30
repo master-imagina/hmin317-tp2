@@ -7,16 +7,19 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Files
 set(HEADERS
-    mainwidget.h
-    geometryengine.h
+    gamewidget.h
+    geometry.h
+    terraingeometry.h
+    renderer.h
     camera.h
     cameracontroller.h
     mainwindow.h
     )
 
 set(SOURCES
-    mainwidget.cpp
-    geometryengine.cpp
+    gamewidget.cpp
+    terraingeometry.cpp
+    renderer.cpp
     camera.cpp
     cameracontroller.cpp
     mainwindow.cpp

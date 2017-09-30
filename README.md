@@ -1,4 +1,4 @@
-Moteurs de jeux : TP1
+Moteurs de jeux : TP2
 =====================
 
 Le compte-rendu de TP est contenu dans le fichier `report.md`.

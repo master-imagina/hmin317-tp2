@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <QMatrix4x4>
+#include <QVector2D>
 #include <QVector3D>
 
 class Camera
@@ -26,11 +27,17 @@ public:
     float theta() const;
     void setTheta(float theta);
 
+    QVector2D orientation() const;
+    void setOrientation(const QVector2D &orientation);
+
     float aspectRatio() const;
     void setAspectRatio(float aspectRatio);
 
     QMatrix4x4 viewMatrix();
     QMatrix4x4 projectionMatrix();
+
+private:
+    void syncUpVector();
 
 private:
     QVector3D m_eyePos;

@@ -2,6 +2,9 @@
 
 #include <cmath>
 
+#include "coordconversions.h"
+
+
 Camera::Camera() :
     m_eyePos(),
     m_upVec(0.f, 1.f, 0.f),
@@ -44,18 +47,7 @@ void Camera::setUpVector(const QVector3D &upVec)
 
 QVector3D Camera::viewVector() const
 {
-    const float cosPhi = std::cos(m_phi);
-    const float sinPhi = std::sin(m_phi);
-
-    const float cosTheta = std::cos(m_theta);
-    const float sinTheta = std::sin(m_theta);
-
-    QVector3D ret(cosTheta * cosPhi,
-                  sinTheta,
-                  -cosTheta * sinPhi);
-    ret.normalize();
-
-    return ret;
+    return sphericalGLToCartesianGL(m_theta, m_phi);
 }
 
 QVector3D Camera::targetPos() const
@@ -82,6 +74,8 @@ void Camera::setPhi(float phi)
     if (m_phi != phi) {
         m_phi = phi;
 
+        syncUpVector();
+
         m_isViewMatrixDirty = true;
     }
 }
@@ -96,8 +90,21 @@ void Camera::setTheta(float theta)
     if (m_theta != theta) {
         m_theta = theta;
 
+        syncUpVector();
+
         m_isViewMatrixDirty = true;
     }
+}
+
+QVector2D Camera::orientation() const
+{
+    return QVector2D(m_phi, m_theta);
+}
+
+void Camera::setOrientation(const QVector2D &orientation)
+{
+    setPhi(orientation.x());
+    setTheta(orientation.y());
 }
 
 float Camera::aspectRatio() const
@@ -136,4 +143,11 @@ QMatrix4x4 Camera::projectionMatrix()
     }
 
     return m_projectionMatrix;
+}
+
+void Camera::syncUpVector()
+{
+    const QVector3D rightVec = rightVector();
+
+    m_upVec = QVector3D::normal(rightVec, viewVector());
 }

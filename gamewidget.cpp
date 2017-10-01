@@ -45,6 +45,11 @@ void GameWidget::setGeometry(TerrainGeometry *geom)
     }
 }
 
+Camera *GameWidget::camera() const
+{
+    return m_camera.get();
+}
+
 void GameWidget::timerEvent(QTimerEvent *)
 {
     update();

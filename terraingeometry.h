@@ -18,7 +18,9 @@ public:
     const std::vector<VertexData> &vertices() const;
     const std::vector<unsigned int> &indices() const;
 
+    std::pair<float, float> widthBounds() const;
     std::pair<float, float> heightBounds() const;
+    std::pair<float, float> depthBounds() const;
 
     bool isDirty() const;
     void unsetDirty();

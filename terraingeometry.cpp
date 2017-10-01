@@ -81,6 +81,22 @@ const std::vector<unsigned int> &TerrainGeometry::indices() const
     return m_indices;
 }
 
+std::pair<float, float> TerrainGeometry::widthBounds() const
+{
+    if (m_vertices.empty()) {
+        return std::make_pair(0., 0.);
+    }
+
+    const auto minMaxHeights =
+            std::minmax_element(m_vertices.begin(), m_vertices.end(),
+                                [] (const VertexData &a, const VertexData &b) {
+        return a.position.x() < b.position.x();
+    });
+
+    return std::make_pair(minMaxHeights.first->position.x(),
+                          minMaxHeights.second->position.x());
+}
+
 std::pair<float, float> TerrainGeometry::heightBounds() const
 {
     if (m_vertices.empty()) {
@@ -95,6 +111,22 @@ std::pair<float, float> TerrainGeometry::heightBounds() const
 
     return std::make_pair(minMaxHeights.first->position.y(),
                           minMaxHeights.second->position.y());
+}
+
+std::pair<float, float> TerrainGeometry::depthBounds() const
+{
+    if (m_vertices.empty()) {
+        return std::make_pair(0., 0.);
+    }
+
+    const auto minMaxHeights =
+            std::minmax_element(m_vertices.begin(), m_vertices.end(),
+                                [] (const VertexData &a, const VertexData &b) {
+        return a.position.z() < b.position.z();
+    });
+
+    return std::make_pair(minMaxHeights.first->position.z(),
+                          minMaxHeights.second->position.z());
 }
 
 bool TerrainGeometry::isDirty() const

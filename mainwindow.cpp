@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 
+#include <algorithm>
+
 #include <QColor>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
 
+#include "camera.h"
+#include "coordconversions.h"
 #include "gamewidget.h"
 #include "terraingeometry.h"
 
@@ -16,16 +20,8 @@ MainWindow::MainWindow() :
     m_gameWidget->setFocus();
     m_gameWidget->setGeometry(m_terrainGeometry.get());
 
-    auto menuBar = new QMenuBar(this);
+    createActions();
 
-    auto fileMenu = new QMenu("&File", menuBar);
-    QAction *openHeightMapAction = fileMenu->addAction("Load heightmap");
-    connect(openHeightMapAction, &QAction::triggered,
-            this, &MainWindow::openLoadHeightMapDialog);
-
-    menuBar->addMenu(fileMenu);
-
-    setMenuBar(menuBar);
     setCentralWidget(m_gameWidget);
 }
 
@@ -71,4 +67,47 @@ void MainWindow::loadHeightMap(const QString &filePath)
     });
 
     m_terrainGeometry->loadTerrainData(heights);
+}
+
+void MainWindow::pointCameraToTerrainCenter()
+{
+    const auto xBounds = m_terrainGeometry->widthBounds();
+    const auto zBounds = m_terrainGeometry->depthBounds();
+    const float maxTerrainHeight = m_terrainGeometry->heightBounds().second;
+
+    const QVector3D center(xBounds.first + xBounds.second / 2 + 50,
+                           0.f,
+                           zBounds.first + zBounds.second / 2 + 50);
+
+    Camera *camera = m_gameWidget->camera();
+    const QVector3D newCameraEye(center.x(), maxTerrainHeight + 20, center.z());
+    const QVector3D cameraDirection = center - newCameraEye;
+    const QVector2D newCameraOrientation = cartesianToSpherical(cameraDirection);
+
+    camera->setEyePos(newCameraEye);
+    camera->setOrientation(newCameraOrientation);
+}
+
+void MainWindow::createActions()
+{
+    auto menuBar = new QMenuBar(this);
+
+    // File menu
+    auto fileMenu = new QMenu("&File", menuBar);
+    QAction *openHeightMapAction = fileMenu->addAction("Load heightmap");
+    openHeightMapAction->setShortcut(QKeySequence("Ctrl+I"));
+    connect(openHeightMapAction, &QAction::triggered,
+            this, &MainWindow::openLoadHeightMapDialog);
+
+    // Camera menu
+    auto cameraMenu = new QMenu("&Camera", menuBar);
+    QAction *targetTerrainCenterAction = cameraMenu->addAction("Target Terrain Center");
+    targetTerrainCenterAction->setShortcut(QKeySequence("C"));
+    connect(targetTerrainCenterAction, &QAction::triggered,
+            this, &MainWindow::pointCameraToTerrainCenter);
+
+    menuBar->addMenu(fileMenu);
+    menuBar->addMenu(cameraMenu);
+
+    setMenuBar(menuBar);
 }

@@ -27,6 +27,8 @@ public:
 
     void setGeometry(TerrainGeometry *geom);
 
+    Camera *camera() const;
+
 protected:
     void timerEvent(QTimerEvent *e) override;
 

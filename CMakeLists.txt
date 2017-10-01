@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Files
 set(HEADERS
+    coordconversions.h
     gamewidget.h
     geometry.h
     terraingeometry.h
@@ -17,6 +18,7 @@ set(HEADERS
     )
 
 set(SOURCES
+    coordconversions.cpp
     gamewidget.cpp
     terraingeometry.cpp
     renderer.cpp

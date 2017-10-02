@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QMatrix4x4>
+#include <QPainter>
 #include <QtMath>
 
 #include "camera.h"
@@ -24,6 +25,10 @@ GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
     installEventFilter(m_cameraController);
 
     m_camera->setEyePos({8, 20, 8});
+
+    auto fpsLabel = new QLabel(QString::number(m_fps) + " fps", this);
+    fpsLabel->setStyleSheet("QLabel { background-color : red }");
+    fpsLabel->move(20, 20);
 }
 
 GameWidget::~GameWidget()

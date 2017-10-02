@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
+#include <QtMath>
 
 #include "camera.h"
 #include "coordconversions.h"
@@ -75,17 +76,15 @@ void MainWindow::pointCameraToTerrainCenter()
     const auto zBounds = m_terrainGeometry->depthBounds();
     const float maxTerrainHeight = m_terrainGeometry->heightBounds().second;
 
-    const QVector3D center(xBounds.first + xBounds.second / 2 + 50,
+    const QVector3D center(xBounds.first + xBounds.second / 2,
                            0.f,
-                           zBounds.first + zBounds.second / 2 + 50);
+                           zBounds.first + zBounds.second / 2);
 
     Camera *camera = m_gameWidget->camera();
-    const QVector3D newCameraEye(center.x(), maxTerrainHeight + 20, center.z());
-    const QVector3D cameraDirection = center - newCameraEye;
-    const QVector2D newCameraOrientation = cartesianToSpherical(cameraDirection);
+    const QVector3D newEye(center.x() + 50, maxTerrainHeight + 50, center.z() + 50);
 
-    camera->setEyePos(newCameraEye);
-    camera->setOrientation(newCameraOrientation);
+    camera->setEyePos(newEye);
+    camera->setTargetPos(center);
 }
 
 void MainWindow::createActions()

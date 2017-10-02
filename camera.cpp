@@ -7,9 +7,8 @@
 
 Camera::Camera() :
     m_eyePos(),
+    m_targetPos(0.f, 0.f, 1.f),
     m_upVec(0.f, 1.f, 0.f),
-    m_phi(0.f),
-    m_theta(0.f),
     m_aspectRatio(1.f),
     m_isViewMatrixDirty(true),
     m_isProjectionMatrixDirty(true),
@@ -45,66 +44,30 @@ void Camera::setUpVector(const QVector3D &upVec)
     }
 }
 
-QVector3D Camera::viewVector() const
-{
-    return sphericalGLToCartesianGL(m_theta, m_phi);
-}
-
 QVector3D Camera::targetPos() const
 {
-    const QVector3D target = m_eyePos + viewVector();
+    return m_targetPos;
+}
 
-    return target;
+void Camera::setTargetPos(const QVector3D &targetPos)
+{
+    if (m_targetPos != targetPos) {
+        m_targetPos = targetPos;
+
+        m_isViewMatrixDirty = true;
+    }
+}
+
+QVector3D Camera::viewVector() const
+{
+    return (m_targetPos - m_eyePos);
 }
 
 QVector3D Camera::rightVector() const
 {
-    const QVector3D ret = QVector3D::normal(viewVector(), m_upVec);
+    const QVector3D ret = QVector3D::normal(viewVector().normalized(), m_upVec);
 
     return ret;
-}
-
-float Camera::phi() const
-{
-    return m_phi;
-}
-
-void Camera::setPhi(float phi)
-{
-    if (m_phi != phi) {
-        m_phi = phi;
-
-        syncUpVector();
-
-        m_isViewMatrixDirty = true;
-    }
-}
-
-float Camera::theta() const
-{
-    return m_theta;
-}
-
-void Camera::setTheta(float theta)
-{
-    if (m_theta != theta) {
-        m_theta = theta;
-
-        syncUpVector();
-
-        m_isViewMatrixDirty = true;
-    }
-}
-
-QVector2D Camera::orientation() const
-{
-    return QVector2D(m_phi, m_theta);
-}
-
-void Camera::setOrientation(const QVector2D &orientation)
-{
-    setPhi(orientation.x());
-    setTheta(orientation.y());
 }
 
 float Camera::aspectRatio() const
@@ -125,7 +88,7 @@ QMatrix4x4 Camera::viewMatrix()
 {
     if (m_isViewMatrixDirty) {
         m_viewMatrix.setToIdentity();
-        m_viewMatrix.lookAt(m_eyePos, targetPos(), m_upVec);
+        m_viewMatrix.lookAt(m_eyePos, m_targetPos, m_upVec);
 
         m_isViewMatrixDirty = false;
     }
@@ -143,11 +106,4 @@ QMatrix4x4 Camera::projectionMatrix()
     }
 
     return m_projectionMatrix;
-}
-
-void Camera::syncUpVector()
-{
-    const QVector3D rightVec = rightVector();
-
-    m_upVec = QVector3D::normal(rightVec, viewVector());
 }

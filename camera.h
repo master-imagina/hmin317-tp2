@@ -17,18 +17,11 @@ public:
     QVector3D upVector() const;
     void setUpVector(const QVector3D &upVector);
 
-    QVector3D viewVector() const;
     QVector3D targetPos() const;
+    void setTargetPos(const QVector3D &targetPos);
+
+    QVector3D viewVector() const;
     QVector3D rightVector() const;
-
-    float phi() const;
-    void setPhi(float phi);
-
-    float theta() const;
-    void setTheta(float theta);
-
-    QVector2D orientation() const;
-    void setOrientation(const QVector2D &orientation);
 
     float aspectRatio() const;
     void setAspectRatio(float aspectRatio);
@@ -37,14 +30,10 @@ public:
     QMatrix4x4 projectionMatrix();
 
 private:
-    void syncUpVector();
-
-private:
     QVector3D m_eyePos;
+    QVector3D m_targetPos;
     QVector3D m_upVec;
 
-    float m_phi;
-    float m_theta;
     float m_aspectRatio;
 
     bool m_isViewMatrixDirty;

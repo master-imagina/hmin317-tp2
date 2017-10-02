@@ -23,7 +23,6 @@ GameWidget::GameWidget(QWidget *parent) :
     installEventFilter(m_cameraController);
 
     m_camera->setEyePos({8, 20, 8});
-    m_camera->setTheta(4.7f);
 }
 
 GameWidget::~GameWidget()

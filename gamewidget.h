@@ -6,7 +6,6 @@
 #include <QBasicTimer>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
 #include <QOpenGLWidget>
 #include <QQuaternion>
 #include <QVector2D>
@@ -42,7 +41,6 @@ protected:
 
 private:
     void initShaders();
-    void initTextures();
 
 private:
     unsigned int m_fps;
@@ -52,8 +50,6 @@ private:
 
     TerrainGeometry *m_geometry;
     std::unique_ptr<Renderer> m_renderer;
-
-    QOpenGLTexture *m_texture;
 
     Camera *m_camera;
     CameraController *m_cameraController;

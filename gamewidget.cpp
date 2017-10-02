@@ -19,12 +19,10 @@ GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
     m_shaderProgram(),
     m_geometry(nullptr),
     m_renderer(nullptr),
-    m_texture(nullptr),
     m_camera(nullptr),
     m_cameraController(new CameraController(this))
 {
     installEventFilter(m_cameraController);
-
 
     auto fpsLabel = new QLabel(QString::number(m_fps) + " fps", this);
     fpsLabel->setStyleSheet("QLabel { background-color : red }");
@@ -33,11 +31,9 @@ GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
 
 GameWidget::~GameWidget()
 {
-    // Make sure the context is current when deleting the texture
-    // and the buffers.
+    // Make sure the context is current when freeing allocated resources
     makeCurrent();
 
-    delete m_texture;
     m_renderer->cleanupResources();
 
     doneCurrent();
@@ -84,7 +80,6 @@ void GameWidget::initializeGL()
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     initShaders();
-    initTextures();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -113,14 +108,6 @@ void GameWidget::initShaders()
     }
 }
 
-void GameWidget::initTextures()
-{
-    m_texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
-    m_texture->setMinificationFilter(QOpenGLTexture::Nearest);
-    m_texture->setMagnificationFilter(QOpenGLTexture::Linear);
-    m_texture->setWrapMode(QOpenGLTexture::Repeat);
-}
-
 void GameWidget::resizeGL(int w, int h)
 {
     m_camera->setAspectRatio(qreal(w) / qreal(h ? h : 1.f));
@@ -129,8 +116,6 @@ void GameWidget::resizeGL(int w, int h)
 void GameWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    m_texture->bind();
 
     // Compute camera position
     m_cameraController->updateCamera(m_camera, m_fps);
@@ -141,7 +126,6 @@ void GameWidget::paintGL()
 
     m_shaderProgram.setUniformValue("mvp_matrix",
                                     projectionMatrix * viewMatrix);
-    m_shaderProgram.setUniformValue("texture", 0);
 
     const std::pair<float, float> heightBounds = m_geometry->heightBounds();
     m_shaderProgram.setUniformValue("minHeight", heightBounds.first);

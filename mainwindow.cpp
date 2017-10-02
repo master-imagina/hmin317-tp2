@@ -18,8 +18,11 @@
 
 MainWindow::MainWindow() :
     m_terrainGeometry(std::make_unique<TerrainGeometry>()),
-    m_gameWidgets()
+    m_gameWidgets(),
+    m_camera(std::make_unique<Camera>())
 {
+    m_camera->setEyePos({8, 20, 8});
+
     auto centralWidget = new QWidget(this);
     auto centralLayout = new QGridLayout(centralWidget);
 
@@ -27,6 +30,7 @@ MainWindow::MainWindow() :
         auto gameWidget = new GameWidget(std::pow(10, i), this);
         gameWidget->setObjectName("GameWidget" + QString::number(i));
         gameWidget->setGeometry(m_terrainGeometry.get());
+        gameWidget->setCamera(m_camera.get());
 
         m_gameWidgets.push_back(gameWidget);
 
@@ -97,11 +101,8 @@ void MainWindow::pointCameraToTerrainCenter()
                            zBounds.first + zBounds.second / 2);
     const QVector3D newEye(center.x() + 50, maxTerrainHeight + 50, center.z() + 50);
 
-    for (const GameWidget *gameWidget : m_gameWidgets) {
-        Camera *camera = gameWidget->camera();
-        camera->setEyePos(newEye);
-        camera->setTargetPos(center);
-    }
+    m_camera->setEyePos(newEye);
+    m_camera->setTargetPos(center);
 }
 
 void MainWindow::createActions()

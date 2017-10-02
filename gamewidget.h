@@ -29,6 +29,7 @@ public:
     void setRendererDirty();
 
     Camera *camera() const;
+    void setCamera(Camera *camera);
 
 protected:
     void timerEvent(QTimerEvent *e) override;
@@ -54,7 +55,7 @@ private:
 
     QOpenGLTexture *m_texture;
 
-    std::unique_ptr<Camera> m_camera;
+    Camera *m_camera;
     CameraController *m_cameraController;
 };
 

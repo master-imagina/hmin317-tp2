@@ -20,12 +20,11 @@ GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
     m_geometry(nullptr),
     m_renderer(nullptr),
     m_texture(nullptr),
-    m_camera(std::make_unique<Camera>()),
+    m_camera(nullptr),
     m_cameraController(new CameraController(this))
 {
     installEventFilter(m_cameraController);
 
-    m_camera->setEyePos({8, 20, 8});
 
     auto fpsLabel = new QLabel(QString::number(m_fps) + " fps", this);
     fpsLabel->setStyleSheet("QLabel { background-color : red }");
@@ -58,7 +57,14 @@ void GameWidget::setRendererDirty()
 
 Camera *GameWidget::camera() const
 {
-    return m_camera.get();
+    return m_camera;
+}
+
+void GameWidget::setCamera(Camera *camera)
+{
+    if (m_camera != camera) {
+        m_camera = camera;
+    }
 }
 
 void GameWidget::timerEvent(QTimerEvent *)
@@ -127,7 +133,7 @@ void GameWidget::paintGL()
     m_texture->bind();
 
     // Compute camera position
-    m_cameraController->updateCamera(m_camera.get(), m_fps);
+    m_cameraController->updateCamera(m_camera, m_fps);
 
     // Send uniforms to shaders
     const QMatrix4x4 viewMatrix = m_camera->viewMatrix();

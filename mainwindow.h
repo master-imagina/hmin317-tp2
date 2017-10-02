@@ -5,6 +5,7 @@
 
 #include <QMainWindow>
 
+class Camera;
 class GameWidget;
 class TerrainGeometry;
 
@@ -28,6 +29,7 @@ private:
 private:
     std::unique_ptr<TerrainGeometry> m_terrainGeometry;
     std::vector<GameWidget *> m_gameWidgets;
+    std::unique_ptr<Camera> m_camera;
 };
 
 #endif // MAINWINDOW_H

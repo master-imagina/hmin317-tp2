@@ -30,8 +30,8 @@ void TerrainGeometry::loadTerrainData(const std::vector<int> &heights)
     int indexCounter = 0;
 
     // Compute...
-    for (int z = 0; z < terrainSize; ++z) {
-        for (int x = 0; x < terrainSize; ++x) {
+    for (int z = 0; z < terrainSize; z++) {
+        for (int x = 0; x < terrainSize; x++) {
             // ...vertices
             const int vertexIndex = z * terrainSize + x;
 

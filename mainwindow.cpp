@@ -26,7 +26,7 @@ MainWindow::MainWindow() :
     auto centralWidget = new QWidget(this);
     auto centralLayout = new QGridLayout(centralWidget);
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; i++) {
         auto gameWidget = new GameWidget(std::pow(10, i), this);
         gameWidget->setObjectName("GameWidget" + QString::number(i));
         gameWidget->setGeometry(m_terrainGeometry.get());

@@ -1,6 +1,7 @@
 #include "gamewidget.h"
 
 #include <QApplication>
+#include <QLabel>
 #include <QMatrix4x4>
 #include <QPainter>
 #include <QtMath>

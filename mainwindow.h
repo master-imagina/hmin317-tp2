@@ -27,7 +27,7 @@ private:
 
 private:
     std::unique_ptr<TerrainGeometry> m_terrainGeometry;
-    GameWidget *m_gameWidget;
+    std::vector<GameWidget *> m_gameWidgets;
 };
 
 #endif // MAINWINDOW_H

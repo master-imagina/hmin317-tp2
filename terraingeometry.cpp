@@ -7,8 +7,7 @@
 
 TerrainGeometry::TerrainGeometry() :
     m_vertices(),
-    m_indices(),
-    m_isDirty(false)
+    m_indices()
 {}
 
 TerrainGeometry::~TerrainGeometry()
@@ -67,8 +66,6 @@ void TerrainGeometry::loadTerrainData(const std::vector<int> &heights)
             m_indices[indexCounter++] = secondSharedIndex;
         }
     }
-
-    m_isDirty = true;
 }
 
 const std::vector<VertexData> &TerrainGeometry::vertices() const
@@ -127,14 +124,4 @@ std::pair<float, float> TerrainGeometry::depthBounds() const
 
     return std::make_pair(minMaxHeights.first->position.z(),
                           minMaxHeights.second->position.z());
-}
-
-bool TerrainGeometry::isDirty() const
-{
-    return m_isDirty;
-}
-
-void TerrainGeometry::unsetDirty()
-{
-    m_isDirty = false;
 }

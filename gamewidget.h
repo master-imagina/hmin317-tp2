@@ -26,6 +26,7 @@ public:
     ~GameWidget();
 
     void setGeometry(TerrainGeometry *geom);
+    void setRendererDirty();
 
     Camera *camera() const;
 
@@ -35,6 +36,8 @@ protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
+
+    void mousePressEvent(QMouseEvent *e) override;
 
 private:
     void initShaders();

@@ -45,6 +45,11 @@ void GameWidget::setGeometry(TerrainGeometry *geom)
     }
 }
 
+void GameWidget::setRendererDirty()
+{
+    m_renderer->updateBuffers(m_geometry);
+}
+
 Camera *GameWidget::camera() const
 {
     return m_camera.get();
@@ -64,7 +69,7 @@ void GameWidget::initializeGL()
 
     m_renderer = std::make_unique<Renderer>();
 
-    glClearColor(0, 0, 0, 1);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
 
     initShaders();
     initTextures();
@@ -115,7 +120,7 @@ void GameWidget::paintGL()
 
     m_texture->bind();
 
-    // Calculate view transformation
+    // Compute camera position
     m_cameraController->updateCamera(m_camera.get(), m_fps);
 
     // Send uniforms to shaders
@@ -132,4 +137,9 @@ void GameWidget::paintGL()
 
     // Draw geometry
     m_renderer->draw(m_geometry, &m_shaderProgram);
+}
+
+void GameWidget::mousePressEvent(QMouseEvent *e)
+{
+    setFocus();
 }

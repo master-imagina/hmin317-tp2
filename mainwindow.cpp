@@ -2,8 +2,10 @@
 
 #include <algorithm>
 
+#include <QBoxLayout>
 #include <QColor>
 #include <QFileDialog>
+#include <QGridLayout>
 #include <QMenu>
 #include <QMenuBar>
 #include <QtMath>
@@ -16,14 +18,24 @@
 
 MainWindow::MainWindow() :
     m_terrainGeometry(std::make_unique<TerrainGeometry>()),
-    m_gameWidget(new GameWidget(30, this))
+    m_gameWidgets()
 {
-    m_gameWidget->setFocus();
-    m_gameWidget->setGeometry(m_terrainGeometry.get());
+    auto centralWidget = new QWidget(this);
+    auto centralLayout = new QGridLayout(centralWidget);
+
+    for (int i = 0; i < 4; ++i) {
+        auto gameWidget = new GameWidget(std::pow(10, i), this);
+        gameWidget->setObjectName("GameWidget" + QString::number(i));
+        gameWidget->setGeometry(m_terrainGeometry.get());
+
+        m_gameWidgets.push_back(gameWidget);
+
+        centralLayout->addWidget(gameWidget, i / 2, i % 2);
+    }
+
+    setCentralWidget(centralWidget);
 
     createActions();
-
-    setCentralWidget(m_gameWidget);
 }
 
 MainWindow::~MainWindow()
@@ -68,6 +80,10 @@ void MainWindow::loadHeightMap(const QString &filePath)
     });
 
     m_terrainGeometry->loadTerrainData(heights);
+
+    for (GameWidget *gameWidget : m_gameWidgets) {
+        gameWidget->setRendererDirty();
+    }
 }
 
 void MainWindow::pointCameraToTerrainCenter()
@@ -79,12 +95,13 @@ void MainWindow::pointCameraToTerrainCenter()
     const QVector3D center(xBounds.first + xBounds.second / 2,
                            0.f,
                            zBounds.first + zBounds.second / 2);
-
-    Camera *camera = m_gameWidget->camera();
     const QVector3D newEye(center.x() + 50, maxTerrainHeight + 50, center.z() + 50);
 
-    camera->setEyePos(newEye);
-    camera->setTargetPos(center);
+    for (const GameWidget *gameWidget : m_gameWidgets) {
+        Camera *camera = gameWidget->camera();
+        camera->setEyePos(newEye);
+        camera->setTargetPos(center);
+    }
 }
 
 void MainWindow::createActions()

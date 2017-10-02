@@ -21,23 +21,21 @@ Renderer::~Renderer()
     cleanupResources();
 }
 
-void Renderer::draw(TerrainGeometry *geom, QOpenGLShaderProgram *program)
+void Renderer::updateBuffers(TerrainGeometry *geom)
 {
     // Update VBOs
-    if (geom->isDirty()) {
-        const std::vector<VertexData> &vertices = geom->vertices();
-        const std::vector<unsigned int> &indices = geom->indices();
+    const std::vector<VertexData> &vertices = geom->vertices();
+    const std::vector<unsigned int> &indices = geom->indices();
 
-        m_arrayVbo.bind();
-        m_arrayVbo.allocate(vertices.data(), vertices.size() * sizeof(VertexData));
+    m_arrayVbo.bind();
+    m_arrayVbo.allocate(vertices.data(), vertices.size() * sizeof(VertexData));
 
-        m_indexVbo.bind();
-        m_indexVbo.allocate(indices.data(), indices.size() * sizeof(unsigned int));
+    m_indexVbo.bind();
+    m_indexVbo.allocate(indices.data(), indices.size() * sizeof(unsigned int));
+}
 
-        geom->unsetDirty();
-    }
-
-    // Draw
+void Renderer::draw(TerrainGeometry *geom, QOpenGLShaderProgram *program)
+{
     m_arrayVbo.bind();
     m_indexVbo.bind();
 

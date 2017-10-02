@@ -15,6 +15,8 @@ public:
     Renderer();
     ~Renderer();
 
+    void updateBuffers(TerrainGeometry *geom);
+
     void draw(TerrainGeometry *geom, QOpenGLShaderProgram *program);
 
     void cleanupResources();

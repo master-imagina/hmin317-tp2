@@ -10,7 +10,7 @@ CameraController::CameraController(QObject *parent) :
     QObject(parent),
     m_keyDirection(KeyDirection::None),
     m_isRotateAroundTargetPressed(false),
-    m_rotateSpeed(3.f),
+    m_rotateSpeed(1.f),
     m_moveSpeed(10.f),
     m_turboSpeed(m_moveSpeed * 4),
     m_turboKeyPressed(false)
@@ -114,10 +114,10 @@ void CameraController::keyPressEvent(QKeyEvent *e)
         m_isRotateAroundTargetPressed = true;
     }
     else if (key == Qt::Key_Up) {
-        m_rotateSpeed += 2.f;
+        m_rotateSpeed *= 2.f;
     }
     else if (key == Qt::Key_Down) {
-        m_rotateSpeed -= 2.f;
+        m_rotateSpeed /= 2.f;
     }
 
     m_keyDirection = (KeyDirection) ((int) m_keyDirection | (int) newDirection);

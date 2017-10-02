@@ -16,7 +16,7 @@
 
 MainWindow::MainWindow() :
     m_terrainGeometry(std::make_unique<TerrainGeometry>()),
-    m_gameWidget(new GameWidget(this))
+    m_gameWidget(new GameWidget(30, this))
 {
     m_gameWidget->setFocus();
     m_gameWidget->setGeometry(m_terrainGeometry.get());

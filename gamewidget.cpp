@@ -10,8 +10,9 @@
 #include "terraingeometry.h"
 
 
-GameWidget::GameWidget(QWidget *parent) :
+GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
     QOpenGLWidget(parent),
+    m_fps(fps),
     m_timer(),
     m_shaderProgram(),
     m_geometry(nullptr),
@@ -71,7 +72,7 @@ void GameWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    m_timer.start(12, this);
+    m_timer.start(1000 / m_fps, this);
 }
 
 void GameWidget::initShaders()
@@ -115,7 +116,7 @@ void GameWidget::paintGL()
     m_texture->bind();
 
     // Calculate view transformation
-    m_cameraController->updateCamera(m_camera.get());
+    m_cameraController->updateCamera(m_camera.get(), m_fps);
 
     // Send uniforms to shaders
     const QMatrix4x4 viewMatrix = m_camera->viewMatrix();

@@ -21,7 +21,7 @@ public:
 
     bool eventFilter(QObject *obj, QEvent *e) override;
 
-    void updateCamera(Camera *camera);
+    void updateCamera(Camera *camera, unsigned int fps);
 
 private:
     void keyPressEvent(QKeyEvent* e);

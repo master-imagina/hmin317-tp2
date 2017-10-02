@@ -22,7 +22,7 @@ class GameWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit GameWidget(QWidget *parent = 0);
+    explicit GameWidget(unsigned int fps, QWidget *parent = 0);
     ~GameWidget();
 
     void setGeometry(TerrainGeometry *geom);
@@ -41,7 +41,9 @@ private:
     void initTextures();
 
 private:
+    unsigned int m_fps;
     QBasicTimer m_timer;
+
     QOpenGLShaderProgram m_shaderProgram;
 
     TerrainGeometry *m_geometry;

@@ -3,11 +3,14 @@
 #include <QKeyEvent>
 
 #include "camera.h"
+#include "cameraactions.h"
 
 
 CameraController::CameraController(QObject *parent) :
     QObject(parent),
     m_keyDirection(KeyDirection::None),
+    m_isRotateAroundTargetPressed(false),
+    m_rotateSpeed(3.f),
     m_moveSpeed(10.f),
     m_turboSpeed(m_moveSpeed * 4),
     m_turboKeyPressed(false)
@@ -40,7 +43,7 @@ bool CameraController::eventFilter(QObject *obj, QEvent *e)
 
 QVector3D CameraController::computeDirectionFromKeys(Camera *camera) const
 {
-    const QVector3D viewVec = camera->viewVector();
+    const QVector3D viewVec = camera->viewVector().normalized();
     const QVector3D rightVec = camera->rightVector();
 
     QVector3D ret;
@@ -68,14 +71,24 @@ QVector3D CameraController::computeDirectionFromKeys(Camera *camera) const
 void CameraController::updateCamera(Camera *camera)
 {
     const QVector3D oldEye = camera->eyePos();
+    const QVector3D oldTarget = camera->targetPos();
 
     const float speed = (m_turboKeyPressed) ? m_turboSpeed : m_moveSpeed;
     const float moveAmount = (12 / 1000.0f) * speed;
 
-    const QVector3D newEye =
-            computeDirectionFromKeys(camera) * moveAmount + oldEye;
+    const QVector3D moveDirection = computeDirectionFromKeys(camera);
+
+    const QVector3D newEye = moveDirection * moveAmount + oldEye;
+    const QVector3D newTarget = moveDirection * moveAmount + oldTarget;
 
     camera->setEyePos(newEye);
+    camera->setTargetPos(newTarget);
+
+    if (m_isRotateAroundTargetPressed) {
+        const float angle = 2.f * (12 / 1000.0f) * m_rotateSpeed;
+
+        rotateCameraAroundTarget(camera, angle);
+    }
 }
 
 void CameraController::keyPressEvent(QKeyEvent *e)
@@ -95,6 +108,16 @@ void CameraController::keyPressEvent(QKeyEvent *e)
     }
     else if (key == Qt::Key_D) {
         newDirection = KeyDirection::Right;
+    }
+
+    else if  (key == Qt::Key_R) {
+        m_isRotateAroundTargetPressed = true;
+    }
+    else if (key == Qt::Key_Up) {
+        m_rotateSpeed += 2.f;
+    }
+    else if (key == Qt::Key_Down) {
+        m_rotateSpeed -= 2.f;
     }
 
     m_keyDirection = (KeyDirection) ((int) m_keyDirection | (int) newDirection);
@@ -122,6 +145,11 @@ void CameraController::keyReleaseEvent(QKeyEvent *e)
     else if (key == Qt::Key_D) {
         directionToExit = KeyDirection::Right;
     }
+
+    else if  (key == Qt::Key_R) {
+        m_isRotateAroundTargetPressed = false;
+    }
+
     else {
         directionToExit = KeyDirection::None;
     }

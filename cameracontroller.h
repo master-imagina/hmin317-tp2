@@ -41,6 +41,9 @@ private:
 
     KeyDirection m_keyDirection;
 
+    bool m_isRotateAroundTargetPressed;
+    float m_rotateSpeed;
+
     float m_moveSpeed;
     float m_turboSpeed;
     bool m_turboKeyPressed;

@@ -26,9 +26,11 @@ MainWindow::MainWindow() :
     m_terrainGeometry(std::make_unique<TerrainGeometry>()),
     m_gameWidgets(),
     m_camera(std::make_unique<Camera>()),
-    m_cameraController(new CameraController(this))
+    m_cameraController(nullptr)
 {
     m_camera->setEyePos({8, 20, 8});
+
+    m_cameraController = new CameraController(centralWidget);
 
     auto centralWidget = new QWidget(this);
     centralWidget->installEventFilter(m_cameraController);

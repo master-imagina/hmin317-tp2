@@ -30,9 +30,8 @@ MainWindow::MainWindow() :
 {
     m_camera->setEyePos({8, 20, 8});
 
-    m_cameraController = new CameraController(centralWidget);
-
     auto centralWidget = new QWidget(this);
+    m_cameraController = new CameraController(centralWidget);
     centralWidget->installEventFilter(m_cameraController);
 
     auto centralLayout = new QGridLayout(centralWidget);

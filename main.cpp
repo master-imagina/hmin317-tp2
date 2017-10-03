@@ -13,9 +13,9 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    auto mw = new MainWindow;
-    mw->setMinimumSize(640, 400);
-    mw->show();
+    MainWindow mw;
+    mw.setMinimumSize(640, 400);
+    mw.show();
 
     return app.exec();
 }

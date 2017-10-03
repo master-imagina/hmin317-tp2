@@ -109,8 +109,3 @@ void GameWidget::paintGL()
     // Draw geometry
     m_renderer->draw(m_geometry, &m_shaderProgram);
 }
-
-void GameWidget::mousePressEvent(QMouseEvent *e)
-{
-    setFocus();
-}

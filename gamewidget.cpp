@@ -1,33 +1,21 @@
 #include "gamewidget.h"
 
-#include <QApplication>
-#include <QLabel>
 #include <QMatrix4x4>
 #include <QPainter>
 #include <QtMath>
 
 #include "camera.h"
-#include "cameracontroller.h"
 #include "renderer.h"
 #include "terraingeometry.h"
 
 
-GameWidget::GameWidget(unsigned int fps, QWidget *parent) :
+GameWidget::GameWidget(QWidget *parent) :
     QOpenGLWidget(parent),
-    m_fps(fps),
-    m_timer(),
     m_shaderProgram(),
     m_geometry(nullptr),
     m_renderer(nullptr),
-    m_camera(nullptr),
-    m_cameraController(new CameraController(this))
-{
-    installEventFilter(m_cameraController);
-
-    auto fpsLabel = new QLabel(QString::number(m_fps) + " fps", this);
-    fpsLabel->setStyleSheet("QLabel { background-color : red }");
-    fpsLabel->move(20, 20);
-}
+    m_camera(nullptr)
+{}
 
 GameWidget::~GameWidget()
 {
@@ -63,14 +51,6 @@ void GameWidget::setCamera(Camera *camera)
     }
 }
 
-void GameWidget::timerEvent(QTimerEvent *)
-{
-    update();
-
-    //FIXME Implement threaded rendering or avoid file dialogs instead of this
-    qApp->processEvents();
-}
-
 void GameWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -83,8 +63,6 @@ void GameWidget::initializeGL()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
-    m_timer.start(1000 / m_fps, this);
 }
 
 void GameWidget::initShaders()
@@ -116,9 +94,6 @@ void GameWidget::resizeGL(int w, int h)
 void GameWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Compute camera position
-    m_cameraController->updateCamera(m_camera, m_fps);
 
     // Send uniforms to shaders
     const QMatrix4x4 viewMatrix = m_camera->viewMatrix();

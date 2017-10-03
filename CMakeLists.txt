@@ -15,6 +15,7 @@ set(HEADERS
     renderer.h
     camera.h
     cameracontroller.h
+    gameloop.h
     mainwindow.h
     )
 
@@ -27,6 +28,7 @@ set(SOURCES
     camera.cpp
     cameracontroller.cpp
     mainwindow.cpp
+    gameloop.cpp
     main.cpp
     )
 

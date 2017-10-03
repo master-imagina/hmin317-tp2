@@ -6,6 +6,8 @@
 #include <QMainWindow>
 
 class Camera;
+class CameraController;
+class GameLoop;
 class GameWidget;
 class TerrainGeometry;
 
@@ -24,12 +26,16 @@ private Q_SLOTS:
     void pointCameraToTerrainCenter();
 
 private:
+    void iterateGameLoop();
     void createActions();
 
 private:
+    GameLoop *m_gameLoop;
     std::unique_ptr<TerrainGeometry> m_terrainGeometry;
     std::vector<GameWidget *> m_gameWidgets;
     std::unique_ptr<Camera> m_camera;
+
+    CameraController *m_cameraController;
 };
 
 #endif // MAINWINDOW_H

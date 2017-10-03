@@ -2,32 +2,58 @@
 
 #include <algorithm>
 
+#include <QApplication>
 #include <QBoxLayout>
 #include <QColor>
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QtMath>
+#include <QTimer>
 
 #include "camera.h"
+#include "cameracontroller.h"
 #include "coordconversions.h"
+#include "gameloop.h"
 #include "gamewidget.h"
 #include "terraingeometry.h"
 
 
 MainWindow::MainWindow() :
+    m_gameLoop(new GameLoop(1000, this)),
     m_terrainGeometry(std::make_unique<TerrainGeometry>()),
     m_gameWidgets(),
-    m_camera(std::make_unique<Camera>())
+    m_camera(std::make_unique<Camera>()),
+    m_cameraController(new CameraController(this))
 {
     m_camera->setEyePos({8, 20, 8});
 
     auto centralWidget = new QWidget(this);
+    centralWidget->installEventFilter(m_cameraController);
+
     auto centralLayout = new QGridLayout(centralWidget);
 
     for (int i = 0; i < 4; i++) {
-        auto gameWidget = new GameWidget(std::pow(10, i), this);
+        auto gameWidget = new GameWidget(this);
+        const int fps = std::pow(10, i);
+
+        if (i < 3) {
+            auto renderTimer = new QTimer(gameWidget);
+            renderTimer->setInterval(1000 / fps);
+
+            connect(renderTimer, &QTimer::timeout,
+                    gameWidget, [gameWidget] {
+                gameWidget->update();
+
+                //FIXME Avoid file dialogs freezing. Implement threaded rendering instead
+                qApp->processEvents();
+            });
+
+            renderTimer->start();
+        }
+
         gameWidget->setObjectName("GameWidget" + QString::number(i));
         gameWidget->setGeometry(m_terrainGeometry.get());
         gameWidget->setCamera(m_camera.get());
@@ -35,11 +61,20 @@ MainWindow::MainWindow() :
         m_gameWidgets.push_back(gameWidget);
 
         centralLayout->addWidget(gameWidget, i / 2, i % 2);
+
+        auto fpsLabel = new QLabel(QString::number(fps) + " fps", gameWidget);
+        fpsLabel->setStyleSheet("QLabel { background-color : red }");
+        fpsLabel->move(20, 20);
     }
 
     setCentralWidget(centralWidget);
 
     createActions();
+
+    m_gameLoop->setCallback([this] { iterateGameLoop(); });
+    m_gameLoop->run();
+
+    centralWidget->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -103,6 +138,16 @@ void MainWindow::pointCameraToTerrainCenter()
 
     m_camera->setEyePos(newEye);
     m_camera->setTargetPos(center);
+}
+
+void MainWindow::iterateGameLoop()
+{
+    m_cameraController->updateCamera(m_camera.get(), m_gameLoop->fps());
+
+    m_gameWidgets[3]->update();
+
+    //FIXME Avoid file dialogs freezing. Implement threaded rendering instead
+    qApp->processEvents();
 }
 
 void MainWindow::createActions()

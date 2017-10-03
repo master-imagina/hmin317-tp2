@@ -142,8 +142,10 @@ void MainWindow::pointCameraToTerrainCenter()
 
 void MainWindow::iterateGameLoop()
 {
+    // Update scene
     m_cameraController->updateCamera(m_camera.get(), m_gameLoop->fps());
 
+    // Render
     m_gameWidgets[3]->update();
 
     //FIXME Avoid file dialogs freezing. Implement threaded rendering instead

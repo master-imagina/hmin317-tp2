@@ -100,10 +100,28 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 //! [0]
 
 //! [1]
+/*
 void MainWidget::timerEvent(QTimerEvent *)
 {
     // Decrease angular speed (friction)
     angularSpeed *= 0.99;
+
+    // Stop rotation when speed goes below threshold
+    if (angularSpeed < 0.01) {
+        angularSpeed = 0.0;
+    } else {
+        // Update rotation
+        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+
+        // Request an update
+        update();
+    }
+}
+*/
+void MainWidget::timerEvent(QTimerEvent *)
+{
+    // Decrease angular speed (friction)
+    angularSpeed *= 1;
 
     // Stop rotation when speed goes below threshold
     if (angularSpeed < 0.01) {
@@ -210,8 +228,8 @@ void MainWidget::paintGL()
 
     matrix.translate(posx, 0, posy);
 
-    //QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
-    //matrix.rotate(framing);
+    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
+    matrix.rotate(framing);
 
     matrix.translate(0.0, -1.8, 0.0);
 

@@ -59,7 +59,9 @@
         \lstinputlisting[language=C++, caption=Selection de la height map, firstline=146, lastline=151, firstnumber=146]{../geometryengine.cpp}
 	L'élément important étant la valeur y, caractérisée par la fonction \texttt{qGray()}, qui va récupérer un pixel d'une \texttt{QImage}, dans notre cas qui s'appelle heightMap, et qu'on utilise la fonction \texttt{QImage::pixel(x, y)} pour récupérer la valeur d'un pixel en RGB aux coordonnées fournies.\\
 	La fonction \texttt{qGray()} va convertir la valeur en niveaux de gris, et par conséquent donner la hauteur (qui est ici divisée par 50 pour éviter d'avoir des valeurs trop élevées).
-	%Mettre image d'une height map et d'un résultat	
+	\image{heightmap_terrain.png}{Résultat d'un terrain qui basé sur une heightmap}
+	 \image{heightmap.png}{Heightmap appliquée}
+	 
 	
 	\pagebreak
 	\section{Question 2}
@@ -73,9 +75,27 @@
 		
 		Dans notre cas, nous allons uniquement incliner le terrain avec une matrice de rotation, soit un Quaternion :
 		\lstinputlisting[language=C++, caption=Rotation du terrain, firstline=213, lastline=214, firstnumber=213]{../mainwidget.cpp}
-		%Ajout screen avant et après inclinaison
+		\image{avantInclinaison.png}{Avant l'inclinaison}
+		\image{apresInclinaison.png}{Après l'inclinaison}
 		
 	\subsection{Faire tourner le terrain autour de son origine avec une vitesse constante.}
 		Lorsqu'on fait glisser le terrain avec la souris, on arrive à faire tourner le terrain, avec une décélération progressive, qui est lié à la friction, pour cela, on constate que tout se passe dans \textit{mainwidget.cpp}, dans les fonctions \texttt{paintGL()} pour appliquer le rendu et \texttt{timerEvent(QTimerEvent*)} qui va appliquer la décélération, et donc une action sur un temps constant.    
+
+	\pagebreak	
+	\section{Question 3}
+	\subsection{Comment est contrôlée la màj du terrain dans MainWidget ?}
+	
+	\subsection{À quoi sert la classe QTimer ? Comment fonctionne-t-elle ?}
+	
+	\subsection{Modifier le constructeur de la classe MainWidget pour qu'il prenne en paramètre la fréquence de mise à jour.}
+	
+	\subsection{Modifier votre programme principal pour afficher votre terrain dans quatres fenêtres différentes.}
+	
+	\subsection{Utiliser les flèches pour modifier les vitesses de rotations de votre terrain}
     
+    \pagebreak
+    \section{Questions bonus}
+    \subsection{Texturer le terrain en utilisant des couleurs}
+    
+    \subsection{Jouer avec la lumière}
 \end{document}

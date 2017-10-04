@@ -6,7 +6,7 @@
 
 #include "camera.h"
 #include "renderer.h"
-#include "terraingeometry.h"
+#include "geometry.h"
 
 
 GameWidget::GameWidget(QWidget *parent) :
@@ -28,7 +28,7 @@ GameWidget::~GameWidget()
     doneCurrent();
 }
 
-void GameWidget::setGeometry(TerrainGeometry *geom)
+void GameWidget::setGeometry(Geometry *geom)
 {
     if (m_geometry != geom) {
         m_geometry = geom;
@@ -39,7 +39,7 @@ void GameWidget::setRendererDirty()
 {
     m_renderer->updateBuffers(m_geometry);
 
-    m_terrainAABB.processVertices(m_geometry->vertices());
+    m_terrainAABB.processVertices(m_geometry->vertices);
 }
 
 Camera *GameWidget::camera() const

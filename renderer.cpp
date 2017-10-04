@@ -3,7 +3,7 @@
 #include <QOpenGLShaderProgram>
 
 #include "geometry.h"
-#include "terraingeometry.h"
+#include "geometry.h"
 
 
 Renderer::Renderer() :
@@ -21,11 +21,11 @@ Renderer::~Renderer()
     cleanupResources();
 }
 
-void Renderer::updateBuffers(TerrainGeometry *geom)
+void Renderer::updateBuffers(Geometry *geom)
 {
     // Update VBOs
-    const std::vector<VertexData> &vertices = geom->vertices();
-    const std::vector<unsigned int> &indices = geom->indices();
+    const std::vector<VertexData> &vertices = geom->vertices;
+    const std::vector<unsigned int> &indices = geom->indices;
 
     m_arrayVbo.bind();
     m_arrayVbo.allocate(vertices.data(), vertices.size() * sizeof(VertexData));
@@ -34,7 +34,7 @@ void Renderer::updateBuffers(TerrainGeometry *geom)
     m_indexVbo.allocate(indices.data(), indices.size() * sizeof(unsigned int));
 }
 
-void Renderer::draw(TerrainGeometry *geom, QOpenGLShaderProgram *program)
+void Renderer::draw(Geometry *geom, QOpenGLShaderProgram *program)
 {
     m_arrayVbo.bind();
     m_indexVbo.bind();

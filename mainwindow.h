@@ -9,7 +9,7 @@ class Camera;
 class CameraController;
 class GameLoop;
 class GameWidget;
-class TerrainGeometry;
+class Geometry;
 
 
 class MainWindow : public QMainWindow
@@ -31,7 +31,7 @@ private:
 
 private:
     GameLoop *m_gameLoop;
-    std::unique_ptr<TerrainGeometry> m_terrainGeometry;
+    std::unique_ptr<Geometry> m_terrainGeometry;
     std::vector<GameWidget *> m_gameWidgets;
     std::unique_ptr<Camera> m_camera;
 

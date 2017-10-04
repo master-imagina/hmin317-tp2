@@ -12,7 +12,7 @@ set(HEADERS
     coordconversions.h
     gamewidget.h
     geometry.h
-    terraingeometry.h
+    heightmap.h
     renderer.h
     camera.h
     cameracontroller.h
@@ -25,7 +25,8 @@ set(SOURCES
     cameraactions.cpp
     coordconversions.cpp
     gamewidget.cpp
-    terraingeometry.cpp
+    geometry.cpp
+    heightmap.cpp
     renderer.cpp
     camera.cpp
     cameracontroller.cpp

@@ -6,7 +6,7 @@
 
 class QOpenGLShaderProgram;
 
-class TerrainGeometry;
+class Geometry;
 
 
 class Renderer : protected QOpenGLFunctions
@@ -15,9 +15,9 @@ public:
     Renderer();
     ~Renderer();
 
-    void updateBuffers(TerrainGeometry *geom);
+    void updateBuffers(Geometry *geom);
 
-    void draw(TerrainGeometry *geom, QOpenGLShaderProgram *program);
+    void draw(Geometry *geom, QOpenGLShaderProgram *program);
 
     void cleanupResources();
 

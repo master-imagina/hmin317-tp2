@@ -13,7 +13,7 @@
 
 class AABoundingBox;
 class Camera;
-class TerrainGeometry;
+class Geometry;
 class Renderer;
 
 
@@ -25,7 +25,7 @@ public:
     explicit GameWidget(QWidget *parent = 0);
     ~GameWidget();
 
-    void setGeometry(TerrainGeometry *geom);
+    void setGeometry(Geometry *geom);
     void setRendererDirty();
 
     Camera *camera() const;
@@ -42,7 +42,7 @@ private:
 private:
     QOpenGLShaderProgram m_shaderProgram;
 
-    TerrainGeometry *m_geometry;
+    Geometry *m_geometry;
     AABoundingBox m_terrainAABB;
     std::unique_ptr<Renderer> m_renderer;
 

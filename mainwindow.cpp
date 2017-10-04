@@ -19,12 +19,13 @@
 #include "coordconversions.h"
 #include "gameloop.h"
 #include "gamewidget.h"
-#include "terraingeometry.h"
+#include "geometry.h"
+#include "heightmap.h"
 
 
 MainWindow::MainWindow() :
     m_gameLoop(new GameLoop(1000, this)),
-    m_terrainGeometry(std::make_unique<TerrainGeometry>()),
+    m_terrainGeometry(std::make_unique<Geometry>()),
     m_gameWidgets(),
     m_camera(std::make_unique<Camera>()),
     m_cameraController(nullptr)
@@ -98,29 +99,13 @@ void MainWindow::openLoadHeightMapDialog()
 
 void MainWindow::loadHeightMap(const QString &filePath)
 {
-    QImage heightMap(filePath);
+    QImage heightmap(filePath);
 
-    if (heightMap.isNull() || !heightMap.isGrayscale()) {
+    if (heightmap.isNull() || !heightmap.isGrayscale()) {
         return;
     }
 
-    const int width = heightMap.width();
-    const int height = heightMap.height();
-
-    std::vector<int> heights(width * height);
-
-    int pxCounter = 0;
-    std::generate(heights.begin(), heights.end(),
-                  [&pxCounter, &width, &heightMap] {
-        const int x = pxCounter / width;
-        const int y = pxCounter % width;
-
-        pxCounter++;
-
-        return qGray(heightMap.pixel(x, y));
-    });
-
-    m_terrainGeometry->loadTerrainData(heights);
+    *m_terrainGeometry = heightmapToGeometry(heightmap);
 
     for (GameWidget *gameWidget : m_gameWidgets) {
         gameWidget->setRendererDirty();
@@ -129,7 +114,7 @@ void MainWindow::loadHeightMap(const QString &filePath)
 
 void MainWindow::pointCameraToTerrainCenter()
 {
-    AABoundingBox terrainAABB(m_terrainGeometry->vertices());
+    AABoundingBox terrainAABB(m_terrainGeometry->vertices);
 
     const QVector3D terrainCenter = terrainAABB.center();
     const QVector3D flatCenter(terrainCenter.x(), 0.f, terrainCenter.z());

@@ -33,8 +33,7 @@ set(SOURCES
     )
 
 set(QT_RESOURCES
-    shaders.qrc
-    textures.qrc)
+    shaders.qrc)
 
 # Packages
 #  Qt5

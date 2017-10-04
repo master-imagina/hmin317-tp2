@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <iostream>
+#include <QCoreApplication>
 
 #include <math.h>
 
@@ -106,6 +107,10 @@ void MainWidget::keyReleaseEvent(QKeyEvent *e)
     }
 }
 
+void MainWidget::setFPS( int _fps)
+{
+    FPS = _fps;
+}
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
@@ -141,12 +146,12 @@ void MainWidget::timerEvent(QTimerEvent *)
         rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
     }
 
-    if (bKeys[0]) {fPositionY -= 0.1;fPositionZ += 0.1;}
-    if (bKeys[1]) {fPositionY += 0.1;fPositionZ -= 0.1;}
-    if (bKeys[2]) fPositionX += 0.1;
-    if (bKeys[3]) fPositionX -= 0.1;
-    if (bKeys[4]) fPositionZ += 0.1;
-    if (bKeys[5]) fPositionZ -= 0.1;
+    if (bKeys[0]) {fPositionY -= 0.1*(int)(1000.0f/(float)FPS);fPositionZ += 0.1*(int)(1000.0f/(float)FPS);}
+    if (bKeys[1]) {fPositionY += 0.1*(int)(1000.0f/(float)FPS);fPositionZ -= 0.1*(int)(1000.0f/(float)FPS);}
+    if (bKeys[2]) fPositionX += 0.1*(int)(1000.0f/(float)FPS);
+    if (bKeys[3]) fPositionX -= 0.1*(int)(1000.0f/(float)FPS);
+    if (bKeys[4]) fPositionZ += 0.1*(int)(1000.0f/(float)FPS);
+    if (bKeys[5]) fPositionZ -= 0.1*(int)(1000.0f/(float)FPS);
 
     update();
 }
@@ -176,7 +181,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start((int)(1000.0f/(float)FPS), this);
 }
 
 
@@ -204,7 +209,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage("heightmap-3.png"));//.mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-3.png"));//.mirrored());
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);

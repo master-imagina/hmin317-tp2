@@ -21,6 +21,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit MainWidget(QWidget *parent = 0);
     ~MainWidget();
+     void setFPS(int _fps);
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
@@ -53,6 +54,7 @@ private:
     float fPositionY;
     float fPositionZ;
     bool bKeys[10];
+    int FPS = 60;
 };
 
 #endif // MAINWIDGET_H

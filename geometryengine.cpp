@@ -2,10 +2,12 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QCoreApplication>
 #include <QImage>
 #include <QRgb>
 #include <cstdlib>
 #include <iostream>
+using namespace std;
 struct VertexData
 {
     QVector3D position;
@@ -38,8 +40,8 @@ GeometryEngine::~GeometryEngine()
 void GeometryEngine::initPlaneGeometry()
 {
     QImage hmap;
-    hmap.load("heightmap-3.png");
-
+    std:: cout << "hi" << std::endl;
+    hmap.load(":/heightmap-3.png");
     iWidth = hmap.width()-1;
     iHeight = hmap.height()-1;
     iWidth = iHeight;

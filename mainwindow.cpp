@@ -108,13 +108,13 @@ void MainWindow::loadHeightMap(const QString &filePath)
 
     std::vector<int> heights(width * height);
 
-    int counter = 0;
+    int pxCounter = 0;
     std::generate(heights.begin(), heights.end(),
-                  [&counter, &width, &heightMap] {
-        const int x = counter / width;
-        const int y = counter % width;
+                  [&pxCounter, &width, &heightMap] {
+        const int x = pxCounter / width;
+        const int y = pxCounter % width;
 
-        counter++;
+        pxCounter++;
 
         return qGray(heightMap.pixel(x, y));
     });

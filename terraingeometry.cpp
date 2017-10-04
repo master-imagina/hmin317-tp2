@@ -38,12 +38,7 @@ void TerrainGeometry::loadTerrainData(const std::vector<int> &heights)
             const float xCoord = vertexIndex % terrainSize;
             const float zCoord = std::floor(vertexIndex / static_cast<float>(terrainSize));
 
-            const bool vertexIsBoundary =
-                    x < 2 || x > terrainSize - 3
-                    || z < 2 || z > terrainSize - 3;
-
-            const float vertexHeight = (vertexIsBoundary) ? 0.f
-                                                          : heights[vertexIndex];
+            const float vertexHeight = heights[vertexIndex];
 
             VertexData &vertex = m_vertices.at(vertexIndex);
             vertex.position = {xCoord, vertexHeight, zCoord};

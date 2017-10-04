@@ -53,13 +53,24 @@
 #include <QMouseEvent>
 
 #include <math.h>
+#include <iostream>
+#include <sstream>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(QWidget *parent, int fps) :
     QOpenGLWidget(parent),
-    geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(0.5),
+    m_fps(fps)
 {
+    rotationAxis.setZ(1.f);
+
+    QString title("Terrain à ");
+    title += QString::number(m_fps);
+    title += " fps";
+    setWindowTitle(title);
+
+    // Une vitesse de 0.5 pour 60 fps, donc
+    angularSpeed = 0.5 * (60.0 / static_cast<double>(m_fps));
 }
 
 MainWidget::~MainWidget()
@@ -76,13 +87,13 @@ MainWidget::~MainWidget()
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
     // Save mouse press position
-    mousePressPosition = QVector2D(e->localPos());
+    //mousePressPosition = QVector2D(e->localPos());
 }
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
     // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
+    /*QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
 
     // Rotation axis along the z axis
     //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
@@ -95,26 +106,18 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
 
     // Increase angular speed
-    angularSpeed += acc;
+    angularSpeed += acc;*/
 }
 //! [0]
 
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
+    // Update rotation
+    rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
 
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
-        // Request an update
-        update();
-    }
+    // Request an update
+    update();
 }
 //! [1]
 
@@ -138,7 +141,8 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    int milliSleep = 1000 / m_fps;
+    timer.start(milliSleep, this);
 }
 
 //! [3]

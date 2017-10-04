@@ -137,7 +137,6 @@ void MainWidget::initializeGL()
     // Enable back face culling
     glEnable(GL_CULL_FACE);
 //! [2]
-
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer

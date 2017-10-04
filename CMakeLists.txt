@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Files
 set(HEADERS
+    aabb.h
     cameraactions.h
     coordconversions.h
     gamewidget.h
@@ -20,6 +21,7 @@ set(HEADERS
     )
 
 set(SOURCES
+    aabb.cpp
     cameraactions.cpp
     coordconversions.cpp
     gamewidget.cpp

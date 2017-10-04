@@ -9,6 +9,9 @@
 #include <QQuaternion>
 #include <QVector2D>
 
+#include "aabb.h"
+
+class AABoundingBox;
 class Camera;
 class TerrainGeometry;
 class Renderer;
@@ -40,6 +43,7 @@ private:
     QOpenGLShaderProgram m_shaderProgram;
 
     TerrainGeometry *m_geometry;
+    AABoundingBox m_terrainAABB;
     std::unique_ptr<Renderer> m_renderer;
 
     Camera *m_camera;

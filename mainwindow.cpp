@@ -13,6 +13,7 @@
 #include <QtMath>
 #include <QTimer>
 
+#include "aabb.h"
 #include "camera.h"
 #include "cameracontroller.h"
 #include "coordconversions.h"
@@ -128,17 +129,17 @@ void MainWindow::loadHeightMap(const QString &filePath)
 
 void MainWindow::pointCameraToTerrainCenter()
 {
-    const auto xBounds = m_terrainGeometry->widthBounds();
-    const auto zBounds = m_terrainGeometry->depthBounds();
-    const float maxTerrainHeight = m_terrainGeometry->heightBounds().second;
+    AABoundingBox terrainAABB(m_terrainGeometry->vertices());
 
-    const QVector3D center(xBounds.first + xBounds.second / 2,
-                           0.f,
-                           zBounds.first + zBounds.second / 2);
-    const QVector3D newEye(center.x() + 50, maxTerrainHeight + 50, center.z() + 50);
+    const QVector3D terrainCenter = terrainAABB.center();
+    const QVector3D flatCenter(terrainCenter.x(), 0.f, terrainCenter.z());
+
+    const QVector3D newEye(flatCenter.x() + 50,
+                           terrainAABB.yBounds().second + 50,
+                           flatCenter.z() + 50);
 
     m_camera->setEyePos(newEye);
-    m_camera->setTargetPos(center);
+    m_camera->setTargetPos(flatCenter);
 }
 
 void MainWindow::iterateGameLoop()

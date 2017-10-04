@@ -13,6 +13,7 @@ GameWidget::GameWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     m_shaderProgram(),
     m_geometry(nullptr),
+    m_terrainAABB(),
     m_renderer(nullptr),
     m_camera(nullptr)
 {}
@@ -37,6 +38,8 @@ void GameWidget::setGeometry(TerrainGeometry *geom)
 void GameWidget::setRendererDirty()
 {
     m_renderer->updateBuffers(m_geometry);
+
+    m_terrainAABB.processVertices(m_geometry->vertices());
 }
 
 Camera *GameWidget::camera() const
@@ -102,9 +105,9 @@ void GameWidget::paintGL()
     m_shaderProgram.setUniformValue("mvp_matrix",
                                     projectionMatrix * viewMatrix);
 
-    const std::pair<float, float> heightBounds = m_geometry->heightBounds();
-    m_shaderProgram.setUniformValue("minHeight", heightBounds.first);
-    m_shaderProgram.setUniformValue("maxHeight", heightBounds.second);
+    const std::pair<float, float> yBounds = m_terrainAABB.yBounds();
+    m_shaderProgram.setUniformValue("minHeight", yBounds.first);
+    m_shaderProgram.setUniformValue("maxHeight", yBounds.second);
 
     // Draw geometry
     m_renderer->draw(m_geometry, &m_shaderProgram);

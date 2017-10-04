@@ -1,7 +1,6 @@
 #ifndef TERRAINGEOMETRY_H
 #define TERRAINGEOMETRY_H
 
-#include <cstddef>
 #include <vector>
 
 #include "geometry.h"
@@ -17,10 +16,6 @@ public:
 
     const std::vector<VertexData> &vertices() const;
     const std::vector<unsigned int> &indices() const;
-
-    std::pair<float, float> widthBounds() const;
-    std::pair<float, float> heightBounds() const;
-    std::pair<float, float> depthBounds() const;
 
 private:
     std::vector<VertexData> m_vertices;

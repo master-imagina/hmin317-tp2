@@ -2,7 +2,7 @@ Moteurs de jeux : compte-rendu de TP2
 =====================================
 
 
-![The main window](report/mainwindow.png)
+![The main window](mainwindow.png)
 
 
 Question 1

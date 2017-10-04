@@ -61,20 +61,35 @@
 #include <QBasicTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+#include <QElapsedTimer>
 
 class GeometryEngine;
-
+struct Eye{
+    float posX;
+    float posY;
+    float posZ;
+    float speed = 1;
+    bool left = false;
+    bool right = false;
+    bool forward = false;
+    bool backward = false;
+};
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
     explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(QWidget *parent,int fps);
+
     ~MainWidget();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void keyPressEvent(QKeyEvent *event)override;
+    void keyReleaseEvent(QKeyEvent *event)override;
+
     void timerEvent(QTimerEvent *e) override;
 
     void initializeGL() override;
@@ -85,9 +100,11 @@ protected:
     void initTextures();
 
 private:
+    const int fps;
     QBasicTimer timer;
     QOpenGLShaderProgram program;
     GeometryEngine *geometries;
+    Eye eye;
 
     QOpenGLTexture *texture;
 
@@ -96,7 +113,9 @@ private:
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed;
+    double speedController;
     QQuaternion rotation;
+    QElapsedTimer elapsedTimer;
 };
 
 #endif // MAINWIDGET_H

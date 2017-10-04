@@ -20,3 +20,5 @@ RESOURCES += \
 # install
 target.path = .
 INSTALLS += target
+
+DISTFILES +=

@@ -61,14 +61,27 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QSurfaceFormat format;
-    format.setDepthBufferSize(24);
+    format.setDepthBufferSize(32);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("plane");
+
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    app.setApplicationName("60 FPS");
+    MainWidget widget60(1000/60);
+    widget60.show();
+    /*app.setApplicationName("1000 FPS");
+    MainWidget widget1000(1000/1000);
+    widget1000.show();
+    app.setApplicationName("100 FPS");
+    MainWidget widget100(1000/100);
+    widget100.show();
+    app.setApplicationName("10 FPS");
+    MainWidget widget10(1000/10);
+    widget10.show();
+    app.setApplicationName("1 FPS");
+    MainWidget widget1(1000/1);
+    widget1.show();*/
 #else
     QLabel note("OpenGL Support required");
     note.show();

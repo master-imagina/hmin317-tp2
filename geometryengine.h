@@ -54,6 +54,10 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+#include <QFile>
+#include <QFileDialog>
+#include <QImage>
+#include <iostream>
 
 class GeometryEngine : protected QOpenGLFunctions
 {
@@ -61,13 +65,18 @@ public:
     GeometryEngine();
     virtual ~GeometryEngine();
 
+    void drawCubeGeometry(QOpenGLShaderProgram *program);
     void drawPlaneGeometry(QOpenGLShaderProgram *program);
 
 private:
+    void initCubeGeometry();
     void initPlaneGeometry();
+    void loadMap(QString localPath);
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
+
+    QImage m_image;
 };
 
 #endif // GEOMETRYENGINE_H

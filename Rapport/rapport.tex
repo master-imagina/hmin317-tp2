@@ -74,18 +74,24 @@
 		\end{itemize}
 		
 		Dans notre cas, nous allons uniquement incliner le terrain avec une matrice de rotation, soit un Quaternion :
-		\lstinputlisting[language=C++, caption=Rotation du terrain, firstline=213, lastline=214, firstnumber=213]{../mainwidget.cpp}
+		\lstinputlisting[language=C++, caption=Rotation du terrain, firstline=231, lastline=232, firstnumber=231]{../mainwidget.cpp}
 		\image{avantInclinaison.png}{Avant l'inclinaison}
 		\image{apresInclinaison.png}{Après l'inclinaison}
 		
 	\subsection{Faire tourner le terrain autour de son origine avec une vitesse constante.}
-		Lorsqu'on fait glisser le terrain avec la souris, on arrive à faire tourner le terrain, avec une décélération progressive, qui est lié à la friction, pour cela, on constate que tout se passe dans \textit{mainwidget.cpp}, dans les fonctions \texttt{paintGL()} pour appliquer le rendu et \texttt{timerEvent(QTimerEvent*)} qui va appliquer la décélération, et donc une action sur un temps constant.    
+		Lorsqu'on fait glisser le terrain avec la souris, on arrive à faire tourner le terrain, avec une décélération progressive, qui est lié à la friction, pour cela, on constate que tout se passe dans \textit{mainwidget.cpp}, dans les fonctions \texttt{paintGL()} pour appliquer le rendu et \texttt{timerEvent(QTimerEvent*)} qui va appliquer la décélération, et donc une action sur un temps constant.\\
+		Cependant, il faut appliquer un mouvement de base, du coup, lors de la mise à jour, on le forcera tout le temps à tourner autour de l'axe Z, avec une vitesse qu'on réglera avec la variable \texttt{angularSpeed}.
 
 	\pagebreak	
 	\section{Question 3}
 	\subsection{Comment est contrôlée la màj du terrain dans MainWidget ?}
+	La mise à jour du terrain s'effectue dans la fonction héritée de QObject :  \textit{timerEvent(QTimerEvent *)}.
 	
 	\subsection{À quoi sert la classe QTimer ? Comment fonctionne-t-elle ?}
+	D'après la documentation du site de Qt\footnote{\url{http://doc.qt.io/qt-5/qtimer.html}} :\\
+	"\textit{The QTimer class provides repetitive and single-shot timers.}"\\
+	QTimer fournit donc des timers dont on fournit la durée, avec un signal à produire à la fin du timer. On peut donc s'en servir par exemple pour contrôler la fréquence de rafraîchissement de la fenêtre, ou bien scripter une scène (par exemple, on a 30 secondes pour atteindre la sortie sinon la porte sera verrouillée).
+	 
 	
 	\subsection{Modifier le constructeur de la classe MainWidget pour qu'il prenne en paramètre la fréquence de mise à jour.}
 	

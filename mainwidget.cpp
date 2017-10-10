@@ -58,7 +58,7 @@ MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(1)
 {
 }
 
@@ -121,14 +121,14 @@ void MainWidget::timerEvent(QTimerEvent *)
 void MainWidget::timerEvent(QTimerEvent *)
 {
     // Decrease angular speed (friction)
-    angularSpeed *= 1;
+    //angularSpeed *= .99;
 
     // Stop rotation when speed goes below threshold
     if (angularSpeed < 0.01) {
         angularSpeed = 0.0;
     } else {
         // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+        rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0,0.0,1.0), angularSpeed) * rotation;
 
         // Request an update
         update();

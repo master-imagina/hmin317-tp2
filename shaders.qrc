@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>vshader.glsl</file>
-        <file>fshader.glsl</file>
+        <file>res/shaders/geom_textured.vert</file>
+        <file>res/shaders/terrain_heightmap.frag</file>
     </qresource>
 </RCC>

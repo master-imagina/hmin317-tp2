@@ -99,10 +99,8 @@
 	\subsection{Modifier votre programme principal pour afficher votre terrain dans quatre fenêtres différentes.}
 	Dans \textit{main.cpp}, il suffit de déclarer 4 MainWidget différents puis de les afficher :
 			\lstinputlisting[language=C++, caption=Déclaration et affichage des fenêtres, firstline=70, lastline=78, firstnumber=70]{../main.cpp}
-	On constate que les 4 fenêtres n'effectuent pas une rotation en même temps, où à 1 fps elle semble "laguer" et pour 100 et 1000fps elle semble fluide.
-	\hfill
-	\pagebreak
-	Cependant, à partir d'au dessus de 60fps, il semblerait que les vitesses supérieures soient bloqués à un framerate lié à l'écran, cela peut être dû à la synchro verticale que les paramètres de l'ordinateur forcent.
+	On constate que les 4 fenêtres n'effectuent pas une rotation en même temps, où à 1 fps elle semble "laguer" et pour 100 et 1000fps elle semble fluide. \\
+	Cependant, à partir d'un framerate au-dessus de 60, il semblerait que les vitesses supérieures soient bloqués à un framerate lié à l'écran (qui est de 60Hz chez moi), cela peut être dû à la synchro verticale que les paramètres de l'ordinateur forcent.
 	
 	\subsection{Utiliser les flèches pour modifier les vitesses de rotations de votre terrain}
 	Dans la fonction \texttt{keyPressEvent(QKeyEvent *e)}, il suffit de rajouter la détection de vitesse (dans mon cas, on utilisera + et - pour augmenter et réduire la vitesse) :
@@ -112,7 +110,8 @@
     \pagebreak
     \section{Questions bonus}
     \subsection{Texturer le terrain en utilisant des couleurs}
-    Comme pour le précédent
+    Comme pour le précédent TP, on sait que les valeurs iront de 0 à 255, donc on appliquera la couleur de la texture selon sa hauteur. Pour cela, je regarderais quelle est la valeur de la plus haute, puis j'appliquerais un pourcentage sur cette plus haute valeur, qui sera le pourcentage de blanc.
     
     \subsection{Jouer avec la lumière}
+    La lumière de type soleil serait une directionnal light. Pour les matériaux et leurs effets, il faudra jouer sur ses types de rendus (voir CR\_TP1).
 \end{document}

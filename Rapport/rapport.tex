@@ -105,11 +105,14 @@
 	Cependant, à partir d'au dessus de 60fps, il semblerait que les vitesses supérieures soient bloqués à un framerate lié à l'écran, cela peut être dû à la synchro verticale que les paramètres de l'ordinateur forcent.
 	
 	\subsection{Utiliser les flèches pour modifier les vitesses de rotations de votre terrain}
-	Dans la fonction \texttt{}
+	Dans la fonction \texttt{keyPressEvent(QKeyEvent *e)}, il suffit de rajouter la détection de vitesse (dans mon cas, on utilisera + et - pour augmenter et réduire la vitesse) :
+	\lstinputlisting[language=C++, caption=Gestion de la vitesse, firstline=262, lastline=263, firstnumber=262]{../mainwidget.cpp}
+	On constate que chaque événement va récupérer la nouvelle information selon la fenêtre sélectionnée.
     
     \pagebreak
     \section{Questions bonus}
     \subsection{Texturer le terrain en utilisant des couleurs}
+    Comme pour le précédent
     
     \subsection{Jouer avec la lumière}
 \end{document}

@@ -67,8 +67,15 @@ int main(int argc, char *argv[])
     app.setApplicationName("TP 2 - Moteurs");
     app.setApplicationVersion("0.2");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    MainWidget widget1(nullptr, 1);
+    MainWidget widget10(nullptr, 10);
+    MainWidget widget100(nullptr, 100);
+    MainWidget widget1000(nullptr, 1000);
+
+    widget1.show();
+    widget10.show();
+    widget100.show();
+    widget1000.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();

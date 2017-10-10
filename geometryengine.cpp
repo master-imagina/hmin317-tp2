@@ -130,15 +130,15 @@ void GeometryEngine::initPlaneGeometry()
 void GeometryEngine::initPlaneGeometry(QWidget *qw)
 {
     //Dans un premier temps, une boite de dialogue pour choisir la height map
-    QString fichier = QFileDialog::getOpenFileName(qw, "Ouvrir Heightmap","../","*.png");
+    /*QString fichier = QFileDialog::getOpenFileName(qw, "Ouvrir Heightmap","../","*.png");
 
     if (fichier.isEmpty() or fichier.isNull())
     {
         std::cout << "Aucun fichier choisi" << std::endl;
         std::exit(0);
-    }
+    }*/
 
-    QImage heightMap(fichier);
+    QImage heightMap(QString("../heightmap-1.png"));
 
     // Create array of the size of the map
     VertexData vertices[heightMap.width() * heightMap.height()];

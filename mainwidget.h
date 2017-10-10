@@ -69,7 +69,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(QWidget *parent = 0, int _fps = 60);
     ~MainWidget();
 
 protected:
@@ -101,6 +101,7 @@ private:
     QQuaternion rotation;
 
     float posx = 0, posy = -5;
+    int fps; float vitesse = 1;
 };
 
 #endif // MAINWIDGET_H

@@ -54,11 +54,11 @@
 
 #include <math.h>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(QWidget *parent, int _fps) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(1)
+    angularSpeed(1), fps(_fps)
 {
 }
 
@@ -124,15 +124,15 @@ void MainWidget::timerEvent(QTimerEvent *)
     //angularSpeed *= .99;
 
     // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
+    /*if (angularSpeed < 0.01) {
         angularSpeed = 0.0;
-    } else {
+    } else {*/
         // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0,0.0,1.0), angularSpeed) * rotation;
+        rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0,0.0,1.0), vitesse) * rotation;
 
         // Request an update
         update();
-    }
+    //}
 }
 //! [1]
 
@@ -156,7 +156,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine(parentWidget());
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(fps, this);
 }
 
 //! [3]
@@ -258,6 +258,9 @@ void MainWidget::keyPressEvent(QKeyEvent *e) {
     //Reception des inputs
     float _x = (float)(e->key() == Qt::Key_Right || e->key() == Qt::Key_D) - (float)(e->key() == Qt::Key_Left || e->key() == Qt::Key_Q);
     float _y = (float)(e->key() == Qt::Key_Up    || e->key() == Qt::Key_Z) - (float)(e->key() == Qt::Key_Down || e->key() == Qt::Key_S);
+
+    vitesse += e->key() == Qt::Key_Plus ? 1 : 0;
+    vitesse -= e->key() == Qt::Key_Minus ? 1 : 0;
 
     posx += _x/10.f;
     posy += _y/10.f;

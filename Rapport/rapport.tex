@@ -94,10 +94,18 @@
 	 
 	
 	\subsection{Modifier le constructeur de la classe MainWidget pour qu'il prenne en paramètre la fréquence de mise à jour.}
+	Lors du constructeur, j'ai rajouté un paramètre \texttt{int \_fps} avec une variable en plus pour la stocker, où on assignera le paramètre au timer. Ensuite, il suffit d'appliquer le framerate dans \texttt{MainWidget::initializeGL()} et plus précisément sur \texttt{timer.start()}.
 	
-	\subsection{Modifier votre programme principal pour afficher votre terrain dans quatres fenêtres différentes.}
+	\subsection{Modifier votre programme principal pour afficher votre terrain dans quatre fenêtres différentes.}
+	Dans \textit{main.cpp}, il suffit de déclarer 4 MainWidget différents puis de les afficher :
+			\lstinputlisting[language=C++, caption=Déclaration et affichage des fenêtres, firstline=70, lastline=78, firstnumber=70]{../main.cpp}
+	On constate que les 4 fenêtres n'effectuent pas une rotation en même temps, où à 1 fps elle semble "laguer" et pour 100 et 1000fps elle semble fluide.
+	\hfill
+	\pagebreak
+	Cependant, à partir d'au dessus de 60fps, il semblerait que les vitesses supérieures soient bloqués à un framerate lié à l'écran, cela peut être dû à la synchro verticale que les paramètres de l'ordinateur forcent.
 	
 	\subsection{Utiliser les flèches pour modifier les vitesses de rotations de votre terrain}
+	Dans la fonction \texttt{}
     
     \pagebreak
     \section{Questions bonus}

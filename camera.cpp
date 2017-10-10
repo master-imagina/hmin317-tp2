@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "coordconversions.h"
-
 
 Camera::Camera() :
     m_eyePos(),

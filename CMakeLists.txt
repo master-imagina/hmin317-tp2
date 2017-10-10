@@ -9,7 +9,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(HEADERS
     aabb.h
     cameraactions.h
-    coordconversions.h
     gamewidget.h
     geometry.h
     heightmap.h
@@ -23,7 +22,6 @@ set(HEADERS
 set(SOURCES
     aabb.cpp
     cameraactions.cpp
-    coordconversions.cpp
     gamewidget.cpp
     geometry.cpp
     heightmap.cpp

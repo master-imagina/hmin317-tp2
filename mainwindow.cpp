@@ -16,7 +16,6 @@
 #include "aabb.h"
 #include "camera.h"
 #include "cameracontroller.h"
-#include "coordconversions.h"
 #include "gameloop.h"
 #include "gamewidget.h"
 #include "geometry.h"

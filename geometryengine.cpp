@@ -52,6 +52,8 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QtWidgets/QFileDialog>
+#include <iostream>
 
 struct VertexData
 {
@@ -60,7 +62,7 @@ struct VertexData
 };
 
 //! [0]
-GeometryEngine::GeometryEngine()
+GeometryEngine::GeometryEngine(QWidget* qw)
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
@@ -70,7 +72,7 @@ GeometryEngine::GeometryEngine()
     indexBuf.create();
 
     // Initializes cube geometry and transfers it to VBOs
-    initPlaneGeometry();
+    initPlaneGeometry(qw);
 }
 
 GeometryEngine::~GeometryEngine()
@@ -80,6 +82,7 @@ GeometryEngine::~GeometryEngine()
 }
 //! [0]
 
+/*
 void GeometryEngine::initPlaneGeometry()
 {
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
@@ -120,6 +123,59 @@ void GeometryEngine::initPlaneGeometry()
     // Transfer index data to VBO 1
     indexBuf.bind();
     indexBuf.allocate(indices, 15*36 * sizeof(GLushort));
+//! [1]
+}*/
+
+//Fonction modifiée pour faire un terrain avec une height map
+void GeometryEngine::initPlaneGeometry(QWidget *qw)
+{/*
+    //Dans un premier temps, une boite de dialogue pour choisir la height map
+    QString fichier = QFileDialog::getOpenFileName(qw, "Ouvrir Heightmap","../","*.png");
+
+    if (fichier.isEmpty() or fichier.isNull())
+    {
+        std::cout << "Aucun fichier choisi" << std::endl;
+        std::exit(0);
+    }
+*/
+    QImage heightMap(QString("../heightmap-1.png"));
+
+    // Create array of the size of the map
+    VertexData vertices[heightMap.width() * heightMap.height()];
+
+    for (int i=0;i<heightMap.height();i++)
+        for (int j=0;j<heightMap.width();j++)
+        {
+            // Vertex data for face 0
+            vertices[heightMap.width()*i+j] = {QVector3D(0.1*(i-8),0.1*(j-8), qGray(heightMap.pixel(i, j))/50.0), QVector2D(0.33*i/16.0,0.5*j/16.0)};
+        }
+
+    tailleIndices = (heightMap.height()-1)*(heightMap.width() + heightMap.height());
+    GLushort indices[tailleIndices];
+
+    for (int i=0;i<(heightMap.height()-1);i++)
+    {
+        indices[(heightMap.width() + heightMap.height())*i] = heightMap.width()*i;
+        indices[(heightMap.width() + heightMap.height())*i+1] = heightMap.width()*i;
+
+        for (int j=2;j<(heightMap.width() + heightMap.height())-2;j+=2)
+        {
+            indices[(heightMap.width() + heightMap.height())*i+j] = heightMap.width()*i +(j-2)/2;
+            indices[(heightMap.width() + heightMap.height())*i+j+1] = heightMap.width()*(i+1) + (j-2)/2;
+        }
+
+        indices[(heightMap.width() + heightMap.height())*i+(heightMap.width() + heightMap.height())-2] = heightMap.width()*(i+1) + heightMap.width()-1;
+        indices[(heightMap.width() + heightMap.height())*i+(heightMap.width() + heightMap.height())-1] = heightMap.width()*(i+1) + heightMap.width()-1;
+    }
+
+//! [1]
+    // Transfer vertex data to VBO 0
+    arrayBuf.bind();
+    arrayBuf.allocate(vertices, heightMap.width() * heightMap.height() * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(indices, tailleIndices * sizeof(GLushort));
 //! [1]
 }
 
@@ -218,6 +274,6 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw plane geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 15*36, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, tailleIndices, GL_UNSIGNED_SHORT, 0);
 }
 //! [2]

@@ -1,0 +1,117 @@
+% Document description
+\documentclass[a4paper,11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[francais]{babel}
+\usepackage{listings}
+\usepackage{graphicx} %Pour inclure les images
+\usepackage{float} %Pour plus de précision sur le placement
+\usepackage{color}
+\usepackage[hidelinks]{hyperref} %Pour les liens dans le PDF
+\usepackage{fancyhdr} %En-tête + pieds de page
+\usepackage{lastpage}
+
+% Metadata
+\title{HMIN317 - Moteur de jeux \\ Compte-rendu TP2}
+\author{BOYER Benoît}
+\date{Septembre 2017}
+
+\input{css.tex}
+
+
+% --------------> Document beginning <--------------
+\begin{document}
+
+  	  %Pattern de Peter Wilson
+  	  \begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	
+	  \raggedleft % Right align the title page
+	
+	  \rule{1pt}{\textheight} % Vertical line
+	  \hspace{0.05\textwidth} % Whitespace between the vertical line and title page text
+	  \parbox[b]{0.75\textwidth}{ % Paragraph box for holding the title page text, adjust the width to move the title page left or right on the page
+		
+		  {\Huge\bfseries Compte-rendu TP2 \\[0.5\baselineskip] Game loops et timers}\\[2\baselineskip] % Title
+		  {\large\textit{HMIN317 - Moteur de jeux}}\\[4\baselineskip] % Subtitle or further description
+		  {\Large\textsc{BOYER Benoît}} % Author name, lower case for consistent small caps
+		
+		  \vspace{0.5\textheight} % Whitespace between the title block and the publisher
+		
+		  {\noindent M2 IMAGINA - Septembre 2017}\\[\baselineskip] % Publisher and logo
+	  }
+
+  \end{titlepage}
+  
+    \tableofcontents
+	\pagebreak
+
+
+    \section{Question 1}
+    \subsection{Modifier votre TP précédent pour lire une height map}
+    Dans un premier temps, on va devoir charger l'image qui va nous servir de height map dans la fonction \texttt{GeometryEngine::initPlaneGeometry(QWidget *qw)}, auquel on aura rajouté le paramètre \texttt{QWidget *qw} pour avoir des fenêtres.
+    \lstinputlisting[language=C++, caption=Selection de la height map, firstline=132, lastline=139, firstnumber=132]{../geometryengine.cpp}
+    \image{choixHeightmap.png}{La fenêtre de dialogue obtenue}
+    Ensuite, on utilise une \texttt{QImage} qui servira à parcourir l'image pour récupérer la valeur des pixels pour les assigner à une hauteur.
+    
+    \subsection{Afficher un terrain à partir d'une height map}
+    Pour générer le terrain à partir de la height map, il suffit d'appliquer la valeur de la heightmap lors de la génération des vertices :
+        \lstinputlisting[language=C++, caption=Selection de la height map, firstline=146, lastline=151, firstnumber=146]{../geometryengine.cpp}
+	L'élément important étant la valeur y, caractérisée par la fonction \texttt{qGray()}, qui va récupérer un pixel d'une \texttt{QImage}, dans notre cas qui s'appelle heightMap, et qu'on utilise la fonction \texttt{QImage::pixel(x, y)} pour récupérer la valeur d'un pixel en RGB aux coordonnées fournies.\\
+	La fonction \texttt{qGray()} va convertir la valeur en niveaux de gris, et par conséquent donner la hauteur (qui est ici divisée par 50 pour éviter d'avoir des valeurs trop élevées).
+	\image{heightmap_terrain.png}{Résultat d'un terrain qui basé sur une heightmap}
+	 \image{heightmap.png}{Heightmap appliquée}
+	 
+	
+	\pagebreak
+	\section{Question 2}
+	\subsection{Modifiez votre fonction d'affichage pour regarder le terrain sous un angle de 45 degrés.}
+		Pour regarder le terrain sous un certain angle, nous avons plusieurs possibilités :
+		\begin{itemize}
+			\item Incliner le terrain
+			\item Incliner la caméra
+			\item Incliner les deux
+		\end{itemize}
+		
+		Dans notre cas, nous allons uniquement incliner le terrain avec une matrice de rotation, soit un Quaternion :
+		\lstinputlisting[language=C++, caption=Rotation du terrain, firstline=231, lastline=232, firstnumber=231]{../mainwidget.cpp}
+		\image{avantInclinaison.png}{Avant l'inclinaison}
+		\image{apresInclinaison.png}{Après l'inclinaison}
+		
+	\subsection{Faire tourner le terrain autour de son origine avec une vitesse constante.}
+		Lorsqu'on fait glisser le terrain avec la souris, on arrive à faire tourner le terrain, avec une décélération progressive, qui est lié à la friction, pour cela, on constate que tout se passe dans \textit{mainwidget.cpp}, dans les fonctions \texttt{paintGL()} pour appliquer le rendu et \texttt{timerEvent(QTimerEvent*)} qui va appliquer la décélération, et donc une action sur un temps constant.\\
+		Cependant, il faut appliquer un mouvement de base, du coup, lors de la mise à jour, on le forcera tout le temps à tourner autour de l'axe Z, avec une vitesse qu'on réglera avec la variable \texttt{angularSpeed}.
+
+	\pagebreak	
+	\section{Question 3}
+	\subsection{Comment est contrôlée la màj du terrain dans MainWidget ?}
+	La mise à jour du terrain s'effectue dans la fonction héritée de QObject :  \textit{timerEvent(QTimerEvent *)}.
+	
+	\subsection{À quoi sert la classe QTimer ? Comment fonctionne-t-elle ?}
+	D'après la documentation du site de Qt\footnote{\url{http://doc.qt.io/qt-5/qtimer.html}} :\\
+	"\textit{The QTimer class provides repetitive and single-shot timers.}"\\
+	QTimer fournit donc des timers dont on fournit la durée, avec un signal à produire à la fin du timer. On peut donc s'en servir par exemple pour contrôler la fréquence de rafraîchissement de la fenêtre, ou bien scripter une scène (par exemple, on a 30 secondes pour atteindre la sortie sinon la porte sera verrouillée).
+	 
+	
+	\subsection{Modifier le constructeur de la classe MainWidget pour qu'il prenne en paramètre la fréquence de mise à jour.}
+	Lors du constructeur, j'ai rajouté un paramètre \texttt{int \_fps} avec une variable en plus pour la stocker, où on assignera le paramètre au timer. Ensuite, il suffit d'appliquer le framerate dans \texttt{MainWidget::initializeGL()} et plus précisément sur \texttt{timer.start()}.
+	
+	\subsection{Modifier votre programme principal pour afficher votre terrain dans quatre fenêtres différentes.}
+	Dans \textit{main.cpp}, il suffit de déclarer 4 MainWidget différents puis de les afficher :
+			\lstinputlisting[language=C++, caption=Déclaration et affichage des fenêtres, firstline=70, lastline=78, firstnumber=70]{../main.cpp}
+	On constate que les 4 fenêtres n'effectuent pas une rotation en même temps, où à 1 fps elle semble "laguer" et pour 100 et 1000fps elle semble fluide. \\
+	Cependant, à partir d'un framerate au-dessus de 60, il semblerait que les vitesses supérieures soient bloqués à un framerate lié à l'écran (qui est de 60Hz chez moi), cela peut être dû à la synchro verticale que les paramètres de l'ordinateur forcent.
+	
+	\subsection{Utiliser les flèches pour modifier les vitesses de rotations de votre terrain}
+	Dans la fonction \texttt{keyPressEvent(QKeyEvent *e)}, il suffit de rajouter la détection de vitesse (dans mon cas, on utilisera + et - pour augmenter et réduire la vitesse) :
+	\lstinputlisting[language=C++, caption=Gestion de la vitesse, firstline=262, lastline=263, firstnumber=262]{../mainwidget.cpp}
+	On constate que chaque événement va récupérer la nouvelle information selon la fenêtre sélectionnée.
+    
+    \pagebreak
+    \section{Questions bonus}
+    \subsection{Texturer le terrain en utilisant des couleurs}
+    Comme pour le précédent TP, on sait que les valeurs iront de 0 à 255, donc on appliquera la couleur de la texture selon sa hauteur. Pour cela, je regarderais quelle est la valeur de la plus haute, puis j'appliquerais un pourcentage sur cette plus haute valeur, qui sera le pourcentage de blanc.
+    
+    \subsection{Jouer avec la lumière}
+    La lumière de type soleil serait une directionnal light. Pour les matériaux et leurs effets, il faudra jouer sur ses types de rendus (voir CR\_TP1).
+\end{document}

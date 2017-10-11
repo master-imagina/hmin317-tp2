@@ -62,7 +62,7 @@
 class GeometryEngine : protected QOpenGLFunctions
 {
 public:
-    GeometryEngine();
+    GeometryEngine(QImage image);
     virtual ~GeometryEngine();
 
     void drawCubeGeometry(QOpenGLShaderProgram *program);
@@ -70,13 +70,15 @@ public:
 
 private:
     void initCubeGeometry();
-    void initPlaneGeometry();
-    void loadMap(QString localPath);
+    bool initPlaneGeometry();
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 
-    QImage m_image;
+    QImage image;
+    int width;
+    int height;
+    int nb_vertices;
 };
 
 #endif // GEOMETRYENGINE_H

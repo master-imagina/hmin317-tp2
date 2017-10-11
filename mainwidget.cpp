@@ -167,7 +167,7 @@ void MainWidget::initializeGL()
     glDisable(GL_CULL_FACE);
 //! [2]
 
-    geometries = new GeometryEngine;
+    geometries = new GeometryEngine(image);
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -194,11 +194,29 @@ void MainWidget::initShaders()
 }
 //! [3]
 
+bool MainWidget::loadMap(QString imagePath)
+{
+    if(image.load(imagePath)) {
+        return true;
+    }
+    std::cerr << "Load \"" << imagePath.toStdString() << "\" failed." << std::endl;
+    return false;
+}
+
 //! [4]
 void MainWidget::initTextures()
 {
-    // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/heightmap-2.png").mirrored());
+    QString imagePath;
+    do {
+        imagePath = QFileDialog::getOpenFileName(
+            this,
+            tr("Pick an image for your heightmap"),
+            "",
+            tr("PNG (*.png);; JPEG (*.jpg *.jpeg)")
+        );
+    } while(!loadMap(imagePath));
+    // Load an image
+    texture = new QOpenGLTexture(image); //.mirrored()
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);

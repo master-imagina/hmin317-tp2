@@ -86,6 +86,8 @@ protected:
     void initShaders();
     void initTextures();
 
+    bool loadMap(QString imagePath);
+
 private:
     QBasicTimer timer;
     QOpenGLShaderProgram program;
@@ -99,6 +101,8 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+
+    QImage image;
 };
 
 #endif // MAINWIDGET_H

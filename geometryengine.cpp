@@ -61,7 +61,7 @@ struct VertexData
 };
 
 //! [0]
-GeometryEngine::GeometryEngine()
+GeometryEngine::GeometryEngine(QImage image)
     : indexBuf(QOpenGLBuffer::IndexBuffer)
 {
     initializeOpenGLFunctions();
@@ -70,7 +70,7 @@ GeometryEngine::GeometryEngine()
     arrayBuf.create();
     indexBuf.create();
 
-    loadMap(":/heightmap-2.png");
+    this->image = image;
 
     // Initializes cube geometry and transfers it to VBOs
     //initCubeGeometry();
@@ -182,54 +182,57 @@ void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
 }
 //! [2]
 
-void GeometryEngine::loadMap(QString localPath)
+bool GeometryEngine::initPlaneGeometry()
 {
-	/*QString imagePath = QFileDialog::getOpenFileName(
-		this,
-		QObject::tr("Open File"),
-		"",
-		QObject::tr("JPEG (*.jpg *.jpeg);;PNG (*.png)")
-	);*/
-
-    if(!m_image.load(localPath)) {
-        std::cerr << "Load \"" << localPath.toStdString() << "\" failed." << std::endl;
+    if(image.isNull()) {
+        std::cerr << "Please load an image before displaying the heightmap." << std::endl;
+        return false;
     }
-}
 
-void GeometryEngine::initPlaneGeometry()
-{
-    int i, j, index, offset, width = m_image.width() / 16, height = m_image.height() / 16, nb_vertices = 16*16, nb_indices = (2*16)*(16-1) + 2*(16-2);
-    float x = {0.0f}, y = {0.0f}, z = {0.0f}, max_height = 0.5;
-    GLushort indices[nb_indices];
-    VertexData vertices[nb_vertices];
+    width = image.width();
+    height = image.height();
+    int i, j,
+        length = 64,
+        m_height = height / length,
+        m_width = width / length;
+    VertexData vertices[length * length];
 
-    for(i = 0, index = 0; i < 16; i++, x = 0.0f, y += 1.0f) {
-        for(j = 0; j < 16; j++, x+=1.0f, index++) {
-            //z = (float) qGray(m_image.pixel(i * width, j * height)) / 255.0 * max_height + 1.5;
-            vertices[index] = {QVector3D(x, y, z), QVector2D(i * 0.33 / 16, j * 0.5 / 16)};
+    for(i = 0; i < length; i++) {
+        for(j = 0; j < length; j++) {
+            vertices[length * i + j] = {
+                QVector3D(0.1 * (i - (length / 2.0)), 0.1 * (j - (length / 2.0)),
+                (float) qGray(image.pixel(m_height * i, m_width * j)) / 255.0 * 10),
+                QVector2D((float) i / length, (float) j / length)
+            };
         }
     }
 
-    for(i = 0, offset = 0; i < 15; i++) {
-        if(i > 0 && i < 15) {
-            indices[offset++] = i*16;
+    nb_vertices = length * 2 + 4;
+    GLushort indices[(length - 1) * nb_vertices];
+
+    for(i = 0; i < length - 1; i++) {
+        indices[nb_vertices * i] = length * i;
+        indices[nb_vertices * i + 1] = length * i;
+
+        for(j = 2; j < nb_vertices; j += 2) {
+            indices[nb_vertices * i + j] = length * i + (j-2) / 2;
+            indices[nb_vertices * i + j + 1] = length * (i+1) + (j-2) / 2;
         }
-        for(j = 0; j < 16; j++) {
-            indices[offset++] = i*16 + j;
-            indices[offset++] = (i+1)*16 + j;
-        }
-        if(i < 15) {
-            indices[offset++] = (i+1)*16 + j-1;
-        }
+
+        indices[nb_vertices * i + nb_vertices - 2] = length * (i+1) + length - 1;
+        indices[nb_vertices * i + nb_vertices - 1] = length * (i+1) + length - 1;
     }
 
     // Transfer vertex data to VBO 0
     arrayBuf.bind();
-    arrayBuf.allocate(vertices, nb_vertices * sizeof(VertexData));
+    arrayBuf.allocate(vertices, length * length * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
-    indexBuf.allocate(indices, nb_indices * sizeof(GLushort));
+    indexBuf.allocate(indices, (length - 1) * nb_vertices * sizeof(GLushort));
+
+    nb_vertices *= (length - 1);
+    return true;
 }
 
 void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
@@ -255,5 +258,5 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 508, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, nb_vertices, GL_UNSIGNED_SHORT, 0);
 }

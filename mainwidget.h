@@ -73,11 +73,11 @@ public:
     explicit MainWidget(QWidget *parent = 0);
     explicit MainWidget(int fps, QWidget *parent = 0);
     ~MainWidget();
-
 protected:
     //void mousePressEvent(QMouseEvent *e) override;
     //void mouseReleaseEvent(QMouseEvent *e) override;
     //void timerEvent(QTimerEvent *e) override;
+    void keyPressEvent(QKeyEvent *e) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -101,6 +101,8 @@ private:
     QQuaternion rotation;
 
     QTimer *timer;
+
+    static float rotationSpeed;
 
 private slots:
     void rotate();

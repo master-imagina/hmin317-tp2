@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
+#include "speed.h"
 #include <iostream>
 
 #include <QMouseEvent>
@@ -60,8 +61,7 @@ using namespace std;
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
-    texture(0),
-    angularSpeed(0)
+    texture(0)
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotate()));
@@ -71,8 +71,7 @@ MainWidget::MainWidget(QWidget *parent) :
 MainWidget::MainWidget(int fps, QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
-    texture(0),
-    angularSpeed(0)
+    texture(0)
 {
     timer = new QTimer(parent);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -136,6 +135,19 @@ void MainWidget::timerEvent(QTimerEvent *)
         update();
     }
 }*/
+
+void MainWidget::keyPressEvent(QKeyEvent *event){
+    switch (event->key()) {
+    case Qt::Key_Up:
+        speedRotation += 0.1;
+        break;
+    case Qt::Key_Down:
+        speedRotation -= 0.1;
+        break;
+    default:
+        break;
+    }
+}
 
 //! [1]
 
@@ -221,7 +233,7 @@ void MainWidget::resizeGL(int w, int h)
 void MainWidget::rotate() {
      QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
      rotationAxis = (rotationAxis * 1 + n).normalized();
-     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, 1) * rotation;
+     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, speedRotation) * rotation;
 }
 
 void MainWidget::paintGL()

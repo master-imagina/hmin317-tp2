@@ -51,10 +51,16 @@
 #include <QApplication>
 #include <QLabel>
 #include <QSurfaceFormat>
+#include <QDesktopWidget>
+#include <QStyle>
 
 #ifndef QT_NO_OPENGL
 #include "mainwidget.h"
 #endif
+
+QImage image;
+
+bool loadMap(QString imagePath);
 
 int main(int argc, char *argv[])
 {
@@ -64,14 +70,58 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("heightmap");
+    app.setApplicationName("TP2 - Game loop et timers");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    QRect windowSize = QApplication::desktop()->screenGeometry();
+    const int frameSpacing = 10,
+              frameHeight = QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight) + frameSpacing,
+              frameWidth = frameSpacing * 2;
+    int height = windowSize.height() / 2 - frameHeight,
+        width = windowSize.width() / 2 - frameWidth;
+    QString imagePath;
+    QFileDialog *dialog = new QFileDialog();
+    dialog->setGeometry(QRect(windowSize.width() / 4, windowSize.height() / 4, windowSize.width() / 2, windowSize.height() / 2));
+    do {
+        imagePath = dialog->getOpenFileName(
+            0,
+            QObject::tr("Pick an image for your heightmap"),
+            "",
+            QObject::tr("PNG (*.png);; JPEG (*.jpg *.jpeg)")
+        );
+    } while(!loadMap(imagePath));
+    MainWidget  window1(0, image, 1),
+                window2(0, image, 10),
+                window3(0, image, 100),
+                window4(0, image, 1000);
+    window1.setWindowTitle("1 FPS");
+    window1.resize(width, height);
+    window1.move(0, 0);
+    window1.show();
+    window2.setWindowTitle("10 FPS");
+    window2.resize(width, height);
+    window2.move(windowSize.width() / 2, 0);
+    window2.show();
+    window3.setWindowTitle("100 FPS");
+    window3.resize(width, height);
+    window3.move(0, windowSize.height() / 2);
+    window3.show();
+    window4.setWindowTitle("1000 FPS");
+    window4.resize(width, height);
+    window4.move(windowSize.width() / 2, windowSize.height() / 2);
+    window4.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();
 #endif
     return app.exec();
+}
+
+bool loadMap(QString imagePath)
+{
+    if(image.load(imagePath)) {
+        return true;
+    }
+    std::cerr << "Load \"" << imagePath.toStdString() << "\" failed." << std::endl;
+    return false;
 }

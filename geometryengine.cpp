@@ -52,6 +52,7 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <QtGui/QColor>
 
 struct VertexData
 {
@@ -69,8 +70,9 @@ GeometryEngine::GeometryEngine()
     arrayBuf.create();
     indexBuf.create();
 
-    // Initializes cube geometry and transfers it to VBOs
-    initPlaneGeometry();
+    // Highmap
+    heightmap = new QImage(":/heightmap-3.png");
+    initPlaneGeometryByHeightmap(heightmap);
 }
 
 GeometryEngine::~GeometryEngine()
@@ -110,6 +112,57 @@ void GeometryEngine::initPlaneGeometry()
 
             indices[36*i+34] = 16*(i+1) + 15;
             indices[36*i+35] = 16*(i+1) + 15;
+    }
+
+//! [1]
+    // Transfer vertex data to VBO 0
+    arrayBuf.bind();
+    arrayBuf.allocate(vertices, 16*16 * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(indices, 15*36 * sizeof(GLushort));
+//! [1]
+}
+
+void GeometryEngine::initPlaneGeometryByHeightmap(QImage *heightmap)
+{
+    // Create array of 16 x 16 vertices facing the camera  (z=cte)
+    VertexData vertices[16*16];
+
+    int x = 0;
+    int y = 0;
+    float z = 0.0f;
+
+    for (int i=0;i<16;i++)
+        for (int j=0;j<16;j++)
+        {
+            // Vertex data for face 0
+            x = heightmap->height() * i / 16;
+                           y = heightmap->width() * j / 16;
+           QColor luminance_calc(heightmap->pixel(x, y));
+           z = 0.2126 * luminance_calc.red() + 0.7152 * luminance_calc.green() + 0.0722 * luminance_calc.blue();
+            vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), z/500), QVector2D(i/16.0,j/16.0)};
+            // add height field eg (i-8)*(j-8)/256.0
+        }
+
+
+    // Draw 15 bands each with 32 vertices, with repeated vertices at the end of each band
+    GLushort indices[15*36];
+
+    for (int i=0;i<15;i++)
+    {
+        indices[36*i] = 16*i;
+        indices[36*i+1] = 16*i;
+
+        for (int j=2;j<34;j+=2)
+        {
+            indices[36*i+j] = 16*i +(j-2)/2;
+            indices[36*i+j+1] = 16*(i+1) + (j-2)/2;
+        }
+
+        indices[36*i+34] = 16*(i+1) + 15;
+        indices[36*i+35] = 16*(i+1) + 15;
     }
 
 //! [1]

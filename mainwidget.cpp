@@ -54,12 +54,16 @@
 
 #include <math.h>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(int fps, QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(0.5),
+    rotationAxis(0.0, 0.0, 1),
+    fps(fps)
+
 {
+    this->grabKeyboard();
 }
 
 MainWidget::~MainWidget()
@@ -70,6 +74,44 @@ MainWidget::~MainWidget()
     delete texture;
     delete geometries;
     doneCurrent();
+}
+
+
+void MainWidget::keyPressEvent(QKeyEvent *e)
+{
+
+    if(e->key() == Qt::Key_Z)
+    {
+        projection.translate(0,1,0);
+        update();
+    }
+    if (e->key() == Qt::Key_S)
+    {
+        projection.translate(0,-1,0);
+        update();
+    }
+    if (e->key() == Qt::Key_Q)
+    {
+        projection.translate(-1,0,0);
+        update();
+    }
+    if (e->key() == Qt::Key_D)
+    {
+        projection.translate(1,0,0);
+        update();
+    }
+
+    if (e->key() == Qt::Key_Up)
+    {
+        angularSpeed +=0.1;
+        update();
+    }
+
+    if (e->key() == Qt::Key_Down)
+    {
+        angularSpeed -=0.1;
+        update();
+    }
 }
 
 //! [0]
@@ -102,19 +144,19 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
+    /*// Decrease angular speed (friction)
     angularSpeed *= 0.99;
 
     // Stop rotation when speed goes below threshold
     if (angularSpeed < 0.01) {
         angularSpeed = 0.0;
-    } else {
+    } else {*/
         // Update rotation
         rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
 
         // Request an update
         update();
-    }
+    //}
 }
 //! [1]
 
@@ -138,7 +180,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000/fps, this);
 }
 
 //! [3]
@@ -166,7 +208,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-3.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -213,7 +255,7 @@ void MainWidget::paintGL()
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
     matrix.rotate(framing);
 
-    matrix.translate(0.0, -1.8, 0.0);
+    matrix.translate(0.0, 0, 0.0);
 
     // QVector3D eye = QVector3D(0.0,0.5,-5.0);
     // QVector3D center = QVector3D(0.0,0.0,2.0);

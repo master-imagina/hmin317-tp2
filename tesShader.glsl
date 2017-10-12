@@ -72,13 +72,13 @@ void main(void){
         //Classic displacement Mapping
         float h=0;
         if(tess_out.height<0.05){
-            h = texture2D(sandDisp,tess_out.v_texcoord*40.0).r*0.5;
+            h = texture2D(sandDisp,tess_out.v_texcoord*15.0).r*0.6;
         }else if(tess_out.height<0.2){
-            h = mix(texture2D(sandDisp,tess_out.v_texcoord*40.0).r*0.5,texture2D(grassDisp,tess_out.v_texcoord*40.0).r*0.1,(tess_out.height - 0.05)/(0.15));   
-        }else if(tess_out.height<0.8){
+            h = mix(texture2D(sandDisp,tess_out.v_texcoord*15.0).r*0.6,texture2D(grassDisp,tess_out.v_texcoord*40.0).r*0.1,(tess_out.height - 0.05)/(0.15));
+        }else if(tess_out.height<0.7){
             h = texture2D(grassDisp,tess_out.v_texcoord*40.0).r*0.1;
         }else if(tess_out.height<0.9){
-            h = mix(texture2D(grassDisp,tess_out.v_texcoord*40.0).r*0.1,texture2D(rockDisp,tess_out.v_texcoord*40.0).r*0.5,(tess_out.height - 0.8));
+            h = mix(texture2D(grassDisp,tess_out.v_texcoord*40.0).r*0.1,texture2D(rockDisp,tess_out.v_texcoord*40.0).r*0.5,(tess_out.height - 0.7)/(0.9-0.7));
         }else{
             h = texture2D(rockDisp,tess_out.v_texcoord*40.0).r*0.5;
         }

@@ -56,17 +56,17 @@ void main()
 
     //Texturing base on heigh
     if(fs_in.height<0.05){
-        albedo = texture2D(sand,fs_in.v_texcoord*40.0);
-        normalColor = normalize(texture2D(sandNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0);
+        albedo = texture2D(sand,fs_in.v_texcoord*15.0);
+        normalColor = normalize(texture2D(sandNormal,fs_in.v_texcoord*15).rgb * 2.0 - 1.0);
     }else if(fs_in.height<0.2){
-        albedo = mix(texture2D(sand,fs_in.v_texcoord*40.0),texture2D(grass,fs_in.v_texcoord*40.0),(fs_in.height - 0.05)/(0.15));
-        normalColor = mix(normalize(texture2D(sandNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),normalize(texture2D(grassNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),(fs_in.height - 0.05)/(0.15));
-    }else if(fs_in.height<0.8){
+        albedo = mix(texture2D(sand,fs_in.v_texcoord*15.0),texture2D(grass,fs_in.v_texcoord*40.0),(fs_in.height - 0.05)/(0.15));
+        normalColor = mix(normalize(texture2D(sandNormal,fs_in.v_texcoord*15).rgb * 2.0 - 1.0),normalize(texture2D(grassNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),(fs_in.height - 0.05)/(0.15));
+    }else if(fs_in.height<0.7){
         albedo = texture2D(grass,fs_in.v_texcoord*40.0);
         normalColor = normalize(texture2D(grassNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0);
     }else if(fs_in.height<0.9){
         albedo = mix(texture2D(grass,fs_in.v_texcoord*40.0),texture2D(rock,fs_in.v_texcoord*40.0),(fs_in.height - 0.8));
-        normalColor = mix(normalize(texture2D(grassNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),normalize(texture2D(rockNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),(fs_in.height - 0.8));
+        normalColor = mix(normalize(texture2D(grassNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),normalize(texture2D(rockNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),(fs_in.height - 0.7)/(0.9-0.7));
     }else{
         albedo = texture2D(rock,fs_in.v_texcoord*40.0);
         normalColor = normalize(texture2D(rockNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0);

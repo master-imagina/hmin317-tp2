@@ -1,16 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>cube.png</file>
-        <file>h.jpg</file>
         <file>cliff.png</file>
         <file>grass.png</file>
         <file>rock.png</file>
         <file>sand.png</file>
-        <file>heightMap.png</file>
         <file>Normal.png</file>
         <file>sandNormal.png</file>
-        <file>heightmap-3.png</file>
-        <file>heightMap.jpg</file>
         <file>grassNormal.png</file>
         <file>rockNormal.png</file>
         <file>sandDisp.png</file>

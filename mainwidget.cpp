@@ -49,17 +49,34 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
+#include "speed.h"
+#include <iostream>
 
+#include <QElapsedTimer>
 #include <QMouseEvent>
-
+#include <Qtime>
 #include <math.h>
+
+using namespace std;
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
-    texture(0),
-    angularSpeed(0)
+    texture(0)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start();
+}
+
+MainWidget::MainWidget(int fps, QWidget *parent) :
+    QOpenGLWidget(parent),
+    geometries(0),
+    texture(0)
+{
+    timer = new QTimer(parent);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(fps);
 }
 
 MainWidget::~MainWidget()
@@ -73,6 +90,8 @@ MainWidget::~MainWidget()
 }
 
 //! [0]
+
+/*
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
     // Save mouse press position
@@ -115,7 +134,21 @@ void MainWidget::timerEvent(QTimerEvent *)
         // Request an update
         update();
     }
+}*/
+
+void MainWidget::keyPressEvent(QKeyEvent *event){
+    switch (event->key()) {
+    case Qt::Key_Up:
+        speedRotation += 0.1;
+        break;
+    case Qt::Key_Down:
+        speedRotation -= 0.1;
+        break;
+    default:
+        break;
+    }
 }
+
 //! [1]
 
 void MainWidget::initializeGL()
@@ -138,7 +171,9 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    //timer.start(12, this);
+
+    elapsedTime.start();
 }
 
 //! [3]
@@ -166,7 +201,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/labyrinthe.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -187,7 +222,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 1000.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -196,6 +231,13 @@ void MainWidget::resizeGL(int w, int h)
     projection.perspective(fov, aspect, zNear, zFar);
 }
 //! [5]
+
+void MainWidget::rotate() {
+     QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+     rotationAxis = (rotationAxis * 1 + n).normalized();
+     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, speedRotation * elapsedTime.elapsed() * 0.01) * rotation;
+     elapsedTime.restart();
+}
 
 void MainWidget::paintGL()
 {
@@ -208,7 +250,7 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(0.0, 0.0, -40.0);
 
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
     matrix.rotate(framing);
@@ -231,4 +273,7 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     geometries->drawPlaneGeometry(&program);
+
+    rotate();
+
 }

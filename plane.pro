@@ -3,7 +3,8 @@ QT       += core gui widgets
 TARGET = plane
 TEMPLATE = app
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    speed.cpp
 
 SOURCES += \
     mainwidget.cpp \
@@ -11,7 +12,8 @@ SOURCES += \
 
 HEADERS += \
     mainwidget.h \
-    geometryengine.h
+    geometryengine.h \
+    speed.h
 
 RESOURCES += \
     shaders.qrc \

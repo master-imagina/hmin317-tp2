@@ -51,7 +51,7 @@
 #include "mainwidget.h"
 
 #include <QMouseEvent>
-
+#include <Qtime>
 #include <math.h>
 
 MainWidget::MainWidget(QWidget *parent) :
@@ -60,6 +60,9 @@ MainWidget::MainWidget(QWidget *parent) :
     texture(0),
     angularSpeed(0)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(rotate()));
+    timer->start();
 }
 
 MainWidget::~MainWidget()
@@ -73,6 +76,8 @@ MainWidget::~MainWidget()
 }
 
 //! [0]
+
+/*
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
     // Save mouse press position
@@ -115,7 +120,8 @@ void MainWidget::timerEvent(QTimerEvent *)
         // Request an update
         update();
     }
-}
+}*/
+
 //! [1]
 
 void MainWidget::initializeGL()
@@ -187,7 +193,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 1000.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -196,6 +202,13 @@ void MainWidget::resizeGL(int w, int h)
     projection.perspective(fov, aspect, zNear, zFar);
 }
 //! [5]
+
+void MainWidget::rotate() {
+    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+     rotationAxis = (rotationAxis * 1 + n).normalized();
+     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, 1) * rotation;
+     update();
+}
 
 void MainWidget::paintGL()
 {
@@ -208,7 +221,7 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -10.0);
+    matrix.translate(0.0, 0.0, -40.0);
 
     QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
     matrix.rotate(framing);
@@ -231,4 +244,7 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     geometries->drawPlaneGeometry(&program);
+
+    rotate();
+
 }

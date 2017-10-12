@@ -61,6 +61,7 @@
 #include <QBasicTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+#include <QTimer>
 
 class GeometryEngine;
 
@@ -73,9 +74,9 @@ public:
     ~MainWidget();
 
 protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void timerEvent(QTimerEvent *e) override;
+    //void mousePressEvent(QMouseEvent *e) override;
+    //void mouseReleaseEvent(QMouseEvent *e) override;
+    //void timerEvent(QTimerEvent *e) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -97,6 +98,9 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+
+private slots:
+    void rotate();
 };
 
 #endif // MAINWIDGET_H

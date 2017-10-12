@@ -52,6 +52,7 @@
 
 #include <QVector2D>
 #include <QVector3D>
+#include <stdlib.h>
 
 struct VertexData
 {
@@ -70,7 +71,8 @@ GeometryEngine::GeometryEngine()
     indexBuf.create();
 
     // Initializes cube geometry and transfers it to VBOs
-    initPlaneGeometry();
+    //initCubeGeometry();
+    initPlaneGeometry(64);
 }
 
 GeometryEngine::~GeometryEngine()
@@ -80,122 +82,78 @@ GeometryEngine::~GeometryEngine()
 }
 //! [0]
 
-void GeometryEngine::initPlaneGeometry()
+void GeometryEngine::initCubeGeometry()
 {
-    // Create array of 16 x 16 vertices facing the camera  (z=cte)
-    VertexData vertices[16*16];
+    // For cube we would need only 8 vertices but we have to
+    // duplicate vertex for each face because texture coordinate
+    // is different.
+    VertexData vertices[] = {
+        // Vertex data for face 0
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.0f, 0.0f)},  // v0
+        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.0f)}, // v1
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.0f, 0.5f)},  // v2
+        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v3
 
-    for (int i=0;i<16;i++)
-        for (int j=0;j<16;j++)
-            {
-                // Vertex data for face 0
-                vertices[16*i+j] = { QVector3D(0.1*(i-8),0.1*(j-8), 2), QVector2D(0.33*i/16.0,0.5*j/16.0)};
-                // add height field eg (i-8)*(j-8)/256.0
-        }
+        // Vertex data for face 1
+        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D( 0.0f, 0.5f)}, // v4
+        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.5f)}, // v5
+        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.0f, 1.0f)},  // v6
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v7
 
+        // Vertex data for face 2
+        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v8
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0f, 0.5f)},  // v9
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}, // v10
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0f, 1.0f)},  // v11
 
-    // Draw 15 bands each with 32 vertices, with repeated vertices at the end of each band
-    GLushort indices[15*36];
+        // Vertex data for face 3
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v12
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(1.0f, 0.0f)},  // v13
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v14
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0f, 0.5f)},  // v15
 
-    for (int i=0;i<15;i++)
-        {
-            indices[36*i] = 16*i;
-            indices[36*i+1] = 16*i;
+        // Vertex data for face 4
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.0f)}, // v16
+        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v17
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v18
+        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v19
 
-            for (int j=2;j<34;j+=2)
-                {
-                    indices[36*i+j] = 16*i +(j-2)/2;
-                    indices[36*i+j+1] = 16*(i+1) + (j-2)/2;
-                }
+        // Vertex data for face 5
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v20
+        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v21
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
+    };
 
-            indices[36*i+34] = 16*(i+1) + 15;
-            indices[36*i+35] = 16*(i+1) + 15;
-    }
+    // Indices for drawing cube faces using triangle strips.
+    // Triangle strips can be connected by duplicating indices
+    // between the strips. If connecting strips have opposite
+    // vertex order then last index of the first strip and first
+    // index of the second strip needs to be duplicated. If
+    // connecting strips have same vertex order then only last
+    // index of the first strip needs to be duplicated.
+    GLushort indices[] = {
+         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
+         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
+         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
+        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
+        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
+        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
+    };
 
 //! [1]
     // Transfer vertex data to VBO 0
     arrayBuf.bind();
-    arrayBuf.allocate(vertices, 16*16 * sizeof(VertexData));
+    arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
 
     // Transfer index data to VBO 1
     indexBuf.bind();
-    indexBuf.allocate(indices, 15*36 * sizeof(GLushort));
+    indexBuf.allocate(indices, 34 * sizeof(GLushort));
 //! [1]
 }
 
-//void GeometryEngine::initPlaneGeometry()
-//{
-//    // For cube we would need only 8 vertices but we have to
-//    // duplicate vertex for each face because texture coordinate
-//    // is different.
-//    VertexData vertices[] = {
-//        // Vertex data for face 0
-//        {QVector3D(-1.0f, -1.0f,  0.0f), QVector2D(0.0f, 0.0f)},  // v0
-//        {QVector3D( 1.0f, -1.0f,  0.0f), QVector2D(0.33f, 0.0f)}, // v1
-//        {QVector3D(-1.0f,  1.0f,  0.0f), QVector2D(0.0f, 0.5f)},  // v2
-//        {QVector3D( 1.0f,  1.0f,  0.0f), QVector2D(0.33f, 0.5f)}, // v3
-
-//        // Vertex data for face 1
-//        {QVector3D( -1.0f+2.0f, -1.0f,  0.0f), QVector2D( 0.0f, 0.5f)}, // v4
-//        {QVector3D( 1.0f+2.0f, -1.0f,  0.0f), QVector2D(0.33f, 0.5f)}, // v5
-//        {QVector3D( -1.0f+2.0f,  1.0f,  0.0f), QVector2D(0.0f, 1.0f)},  // v6
-//        {QVector3D(  1.0f+2.0f,  1.0f,  0.0f), QVector2D(0.33f, 1.0f)}, // v7
-
-//        // Vertex data for face 2
-//        {QVector3D(-1.0f+4.0f, -1.0f,  0.0f), QVector2D(0.66f, 0.5f)}, // v8
-//        {QVector3D( 1.0f+4.0f, -1.0f,  0.0f), QVector2D(1.0f, 0.5f)},  // v9
-//        {QVector3D(-1.0f+4.0f, 1.0f,  0.0f), QVector2D(0.66f, 1.0f)}, // v10
-//        {QVector3D( 1.0f+4.0f,  1.0f,  0.0f), QVector2D(1.0f, 1.0f)},  // v11
-
-//        // Vertex data for face 3
-//        {QVector3D(-1.0f, -1.0f+2.0f,  0.0f), QVector2D(0.66f, 0.0f)}, // v12
-//        {QVector3D(1.0f, -1.0f+2.0f,  0.0f), QVector2D(1.0f, 0.0f)},  // v13
-//        {QVector3D(-1.0,  1.0f+2.0f,  0.0f), QVector2D(0.66f, 0.5f)}, // v14
-//        {QVector3D(1.0f,  1.0f+2.0f,  0.0f), QVector2D(1.0f, 0.5f)},  // v15
-
-//        // Vertex data for face 4
-//        {QVector3D(-1.0f+2.0f, -1.0f+2.0f,  0.0f), QVector2D(0.33f, 0.0f)}, // v16
-//        {QVector3D( 1.0f+2.0f, -1.0f+2.0f,  0.0f), QVector2D(0.66f, 0.0f)}, // v17
-//        {QVector3D(-1.0f+2.0f, 1.0f+2.0f,  0.0f), QVector2D(0.33f, 0.5f)}, // v18
-//        {QVector3D( 1.0f+2.0f, 1.0f+2.0f,  0.0f), QVector2D(0.66f, 0.5f)}, // v19
-
-//        // Vertex data for face 5
-//        {QVector3D(-1.0f+4.0f, -1.0f+2.0f,  0.0f), QVector2D(0.33f, 0.5f)}, // v20
-//        {QVector3D( 1.0f+4.0f, -1.0f+2.0f,  0.0f), QVector2D(0.66f, 0.5f)}, // v21
-//        {QVector3D(-1.0f+4.0f,  1.0f+2.0f,  0.0f), QVector2D(0.33f, 1.0f)}, // v22
-//        {QVector3D( 1.0f+4.0f,  1.0f+2.0f,  0.0f), QVector2D(0.66f, 1.0f)}  // v23
-//    };
-
-//    // Indices for drawing cube faces using triangle strips.
-//    // Triangle strips can be connected by duplicating indices
-//    // between the strips. If connecting strips have opposite
-//    // vertex order then last index of the first strip and first
-//    // index of the second strip needs to be duplicated. If
-//    // connecting strips have same vertex order then only last
-//    // index of the first strip needs to be duplicated.
-//    GLushort indices[] = {
-//         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
-//         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-//         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-//        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-//        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-//        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
-//    };
-
-////! [1]
-//    // Transfer vertex data to VBO 0
-//    arrayBuf.bind();
-//    arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
-
-//    // Transfer index data to VBO 1
-//    indexBuf.bind();
-//    indexBuf.allocate(indices, 34 * sizeof(GLushort));
-////! [1]
-//}
-
-
 //! [2]
-void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
+void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
 {
     // Tell OpenGL which VBOs to use
     arrayBuf.bind();
@@ -217,7 +175,64 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program)
     program->enableAttributeArray(texcoordLocation);
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
-    // Draw plane geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLE_STRIP, 15*36, GL_UNSIGNED_SHORT, 0);
+    // Draw cube geometry using indices from VBO 1
+    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
 }
 //! [2]
+
+void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program, int size) {
+    // Tell OpenGL which VBOs to use
+    arrayBuf.bind();
+    indexBuf.bind();
+
+    // Offset for position
+    quintptr offset = 0;
+
+    // Tell OpenGL programmable pipeline how to locate vertex position data
+    int vertexLocation = program->attributeLocation("a_position");
+    program->enableAttributeArray(vertexLocation);
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+    // Offset for texture coordinate
+    offset += sizeof(QVector3D);
+
+    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
+    int texcoordLocation = program->attributeLocation("a_texcoord");
+    program->enableAttributeArray(texcoordLocation);
+    program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+    // Draw cube geometry using indices from VBO 1
+    glDrawElements(GL_TRIANGLES, ((size - 1) * (size -1) * 6), GL_UNSIGNED_SHORT, 0);
+}
+
+void GeometryEngine::initPlaneGeometry(int size) {
+    VertexData vert[size*size];
+    GLushort indices[(size - 1) * (size - 1) * 6];
+    // creation des vertices
+    int i = 0;
+    float size_half = (size / 2.0f);
+    for(int y= 0; y < size; ++y) {
+        for(int x = 0; x < size; ++x) {
+            vert[i++] = {QVector3D((x / size_half) * 4, 0.0f, (y / size_half) * 4), QVector2D((x / (size - 1.0f)), (y / (size - 1.0f)))};
+        }
+    }
+    //init tableau indices
+    int j = 0;
+    for(int y= 0; y < (size - 1); ++y) {
+        for(int x = 0; x < (size - 1); ++x) {
+            indices[j++] = (y*size) + x;
+            indices[j++] = (y*size) + x + 1;
+            indices[j++] = (y*size) + x + size;
+            indices[j++] = (y*size) + x + 1;
+            indices[j++] = (y*size) + x + size + 1;
+            indices[j++] = (y*size) + x + size;
+        }
+    }
+    // Transfer vertex data to VBO 0
+    arrayBuf.bind();
+    arrayBuf.allocate(vert, (size * size) * sizeof(VertexData));
+
+    // Transfer index data to VBO 1
+    indexBuf.bind();
+    indexBuf.allocate(indices, ((size - 1) * (size- 1) * 6) * sizeof(GLushort));
+}

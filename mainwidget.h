@@ -59,7 +59,9 @@
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
-#include <QBasicTimer>
+#include <QTime>
+#include <QTimer>
+#include <QElapsedTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
@@ -71,7 +73,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(int msFPS, QWidget *parent = 0);
     ~MainWidget();
 
 protected:
@@ -105,7 +107,7 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
-    int fov;
+    int fov, fps;
 };
 
 #endif // MAINWIDGET_H

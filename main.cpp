@@ -68,8 +68,18 @@ int main(int argc, char *argv[])
     app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+   /* app.setApplicationName("plan 10 fps");
+    MainWidget widget10(10);
+    widget10.show();
+    app.setApplicationName("plan 60 fps");
+    MainWidget widget60(60);
+    widget60.show();*/
+    app.setApplicationName("plan 100 fps");
+    MainWidget widget100(100);
+    widget100.show();
+    app.setApplicationName("plan 1000 fps");
+    MainWidget widget1000(1000);
+    widget1000.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();

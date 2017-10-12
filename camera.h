@@ -17,7 +17,7 @@ typedef enum Camera_Movement {
 class Camera
 {
 public:
-    Camera(QVector3D position = QVector3D(4.0f, 2.0f, 5.0f), QVector3D up = QVector3D(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = -45.0f)
+    Camera(QVector3D position = QVector3D(4.0f, 6.0f, 5.0f), QVector3D up = QVector3D(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = -45.0f)
         : cameraFront(0.0f, 0.0f, -1.0f)
     {
         cameraPos = position;
@@ -28,14 +28,15 @@ public:
     }
     void processKeyPress(Camera_Movement movement);
     void processMouseMovement(float xoffset, float yoffset);
-    void orbitAround();
+    void orbitAround(QMatrix4x4 &matrix, float y, float p);
     void lookAt(QMatrix4x4 &matrix);
+    void setTarget();
 
     QVector3D getFront();
 
 private:
     float pitch, yaw;
-    QVector3D cameraPos, cameraFront, cameraUp, cameraRight, worldUp;
+    QVector3D cameraPos, cameraFront, cameraUp, cameraRight, worldUp, target;
 
     void updateCameraVectors();
 };

@@ -54,6 +54,8 @@
 #include <QVector3D>
 #include <stdlib.h>
 
+#define PLANE_SIZE 128
+
 struct VertexData
 {
     QVector3D position;
@@ -72,7 +74,7 @@ GeometryEngine::GeometryEngine()
 
     // Initializes cube geometry and transfers it to VBOs
     //initCubeGeometry();
-    initPlaneGeometry(64);
+    initPlaneGeometry();
 }
 
 GeometryEngine::~GeometryEngine()
@@ -180,7 +182,7 @@ void GeometryEngine::drawCubeGeometry(QOpenGLShaderProgram *program)
 }
 //! [2]
 
-void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program, int size) {
+void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program) {
     // Tell OpenGL which VBOs to use
     arrayBuf.bind();
     indexBuf.bind();
@@ -202,15 +204,16 @@ void GeometryEngine::drawPlaneGeometry(QOpenGLShaderProgram *program, int size) 
     program->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
     // Draw cube geometry using indices from VBO 1
-    glDrawElements(GL_TRIANGLES, ((size - 1) * (size -1) * 6), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, ((PLANE_SIZE - 1) * (PLANE_SIZE -1) * 6), GL_UNSIGNED_SHORT, 0);
 }
 
-void GeometryEngine::initPlaneGeometry(int size) {
+void GeometryEngine::initPlaneGeometry() {
+    const int size = PLANE_SIZE;
     VertexData vert[size*size];
     GLushort indices[(size - 1) * (size - 1) * 6];
     // creation des vertices
     int i = 0;
-    float size_half = (size / 2.0f);
+    float size_half = (size / 4.0f);
     for(int y= 0; y < size; ++y) {
         for(int x = 0; x < size; ++x) {
             vert[i++] = {QVector3D((x / size_half) * 4, 0.0f, (y / size_half) * 4), QVector2D((x / (size - 1.0f)), (y / (size - 1.0f)))};

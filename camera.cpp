@@ -1,5 +1,6 @@
 #include "camera.h"
 #include <QtMath>
+#include <iostream>
 
 void Camera::processKeyPress(Camera_Movement movement) {
     float cameraSpeed = 0.3f;
@@ -41,17 +42,28 @@ void Camera::processMouseMovement(float xoffset, float yoffset) {
 }
 
 void Camera::lookAt(QMatrix4x4 &matrix) {
-    matrix.lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    target = cameraPos + cameraFront;
+    matrix.lookAt(cameraPos, target, cameraUp);
 }
 
 QVector3D Camera::getFront() {
     return cameraFront;
 }
 
-void Camera::orbitAround() {
+void Camera::orbitAround(QMatrix4x4 &matrix, float y, float p) {
+
     cameraPos += QVector3D::crossProduct(cameraFront,cameraUp).normalized() * 0.1f;
     processMouseMovement(-5.0f, 0.0f);
     updateCameraVectors();
+
+    //a debug
+/*
+    matrix.rotate(p, cameraRight.normalized());
+    cameraPos = (matrix * (cameraPos - target)) + target;
+    matrix.rotate(y, cameraUp.normalized());
+    cameraPos = (matrix * (cameraPos - target)) + target;
+    matrix.lookAt(cameraPos, target, cameraUp);
+*/
 }
 
 void Camera::updateCameraVectors() {

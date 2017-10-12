@@ -54,7 +54,7 @@
 
 #include <math.h>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(int fps, QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     height(0),
@@ -62,7 +62,8 @@ MainWidget::MainWidget(QWidget *parent) :
     rock(0),
     angularSpeed(0),
     camera(),
-    orbit(false)
+    orbit(false),
+    fps(fps)
 {
     setMouseTracking(true);
 }
@@ -88,6 +89,7 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+
     if(e->button() == Qt::RightButton) {
        /* // Mouse release position - mouse press position
         QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
@@ -102,10 +104,8 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
         // Calculate new rotation axis as weighted sum
         rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
         // Increase angular speed
-        angularSpeed += acc;
-        //angularSpeed = 0.3f;*/
+        angularSpeed += acc;*/
         orbit = !orbit;
-        update();
     }
 }
 //! [0]
@@ -116,7 +116,7 @@ void MainWidget::wheelEvent(QWheelEvent *event) {
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
+    /*// Decrease angular speed (friction)
     angularSpeed *= 0.99;
 
     // Stop rotation when speed goes below threshold
@@ -125,11 +125,10 @@ void MainWidget::timerEvent(QTimerEvent *)
     } else {
         // Update rotation
         rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-        //rotation = QQuaternion::fromAxisAndAngle(camera.getFront(), angularSpeed) * rotation;
         // Request an update
         update();
-    }
-    if(orbit) update();
+    }*/
+    update();
 }
 //! [1]
 
@@ -154,7 +153,6 @@ void MainWidget::keyPressEvent(QKeyEvent *event) {
             camera.processKeyPress(Camera_Movement::W);
             break;
     }
-    update();
 }
 
 void MainWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -163,7 +161,6 @@ void MainWidget::mouseMoveEvent(QMouseEvent *event) {
         float yoffset = mousePressPosition.y() - event->y(); // reversed since y-coordinates range from bottom to top
         mousePressPosition = QVector2D(event->localPos());
         camera.processMouseMovement(xoffset, yoffset);
-        update();
     }
 }
 
@@ -186,7 +183,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000/fps, this);
 }
 
 //! [3]
@@ -266,9 +263,12 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
     if(orbit) {
-        camera.orbitAround();
-    }
+        camera.orbitAround(matrix, 1.0f , 0.0f);
+    }/*else {
+        camera.lookAt(matrix);
+    }*/
     camera.lookAt(matrix);
+
     matrix.rotate(rotation);
 
     // Set modelview-projection matrix
@@ -282,6 +282,6 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     //geometries->drawCubeGeometry(&program);
-    geometries->drawPlaneGeometry(&program, 64);
+    geometries->drawPlaneGeometry(&program);
 
 }

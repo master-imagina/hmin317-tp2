@@ -51,14 +51,20 @@
 #include "mainwidget.h"
 
 #include <QMouseEvent>
+#include <QKeyEvent>
+#include <Qt>
 
 #include <math.h>
+#include <iostream>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(QWidget *parent, int fps) :
     QOpenGLWidget(parent),
+    fps(fps),
     geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(0.1),
+    position(0.0, 0.0, -50.0),
+    rotationAxis(0.0,0.0,1.0)
 {
 }
 
@@ -75,46 +81,69 @@ MainWidget::~MainWidget()
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-    // Save mouse press position
-    mousePressPosition = QVector2D(e->localPos());
 }
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
-
-    // Rotation axis along the z axis
-    //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
-
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
-
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-
-    // Increase angular speed
-    angularSpeed += acc;
 }
+
+// Adding arrows pressed to the list of directions the camera will have to go
+void MainWidget::keyPressEvent(QKeyEvent *e)
+{
+    cameraDirections.push_back(e->key());
+}
+
+// Deleting the relevant key when released
+void MainWidget::keyReleaseEvent(QKeyEvent *e) {
+    for (unsigned int i = 0; i < cameraDirections.size(); i++) {
+        if (cameraDirections[i] == e->key()) {
+            cameraDirections.erase(cameraDirections.begin() + i);
+            break;
+        }
+    }
+}
+
+
+void MainWidget::wheelEvent(QWheelEvent *e)
+{
+    if(e->phase() == Qt::ScrollUpdate)
+    {
+        wheelDirection = (e->delta() > 0 ? 1 : -1);
+    }
+}
+
+
 //! [0]
 
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
-
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
-        // Request an update
-        update();
+    const float speed = 0.03;
+    const float scrollSpeed = 0.0005;
+    for (unsigned int i = 0; i < cameraDirections.size(); i++) {
+        switch (cameraDirections[i]) {
+            case Qt::Key_Left:
+                angularSpeed += speed;
+                break;
+            case Qt::Key_Right:
+                angularSpeed -= speed;
+                break;
+        }
     }
+
+    if(wheelDirection != 0)
+    {
+        position.setZ(position.z() + wheelDirection * scrollSpeed * elapsedTimer.elapsed());
+        wheelDirection = 0;
+    }
+
+    // Update rotation
+    rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed * elapsedTimer.elapsed()) * rotation;
+
+    elapsedTimer.restart();
+    // Request an update
+    update();
+
 }
 //! [1]
 
@@ -138,7 +167,9 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000/fps, this);
+
+    elapsedTimer.start();
 }
 
 //! [3]
@@ -166,7 +197,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-2.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -177,6 +208,7 @@ void MainWidget::initTextures()
     // Wrap texture coordinates by repeating
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
     texture->setWrapMode(QOpenGLTexture::Repeat);
+
 }
 //! [4]
 
@@ -186,8 +218,8 @@ void MainWidget::resizeGL(int w, int h)
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
-    // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    const qreal zNear = 1.0, zFar = 1000.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -208,27 +240,20 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(position);
 
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
-    matrix.rotate(framing);
-
-    matrix.translate(0.0, -1.8, 0.0);
-
-    // QVector3D eye = QVector3D(0.0,0.5,-5.0);
-    // QVector3D center = QVector3D(0.0,0.0,2.0);
-    // QVector3D up = QVector3D(-1,0,0);
-    // matrix.lookAt(eye,center,up);
+    matrix.rotate(QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -45.0));
 
     matrix.rotate(rotation);
 
-
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);
+//! [6]
 
     // Use texture unit 0 which contains cube.png
     program.setUniformValue("texture", 0);
 
     // Draw cube geometry
+//    geometries->drawCubeGeometry(&program);
     geometries->drawPlaneGeometry(&program);
 }

@@ -49,10 +49,13 @@
 ****************************************************************************/
 
 #include "mainwidget.h"
+#include <iostream>
 
 #include <QMouseEvent>
 #include <Qtime>
 #include <math.h>
+
+using namespace std;
 
 MainWidget::MainWidget(QWidget *parent) :
     QOpenGLWidget(parent),
@@ -63,6 +66,18 @@ MainWidget::MainWidget(QWidget *parent) :
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotate()));
     timer->start();
+}
+
+MainWidget::MainWidget(int fps, QWidget *parent) :
+    QOpenGLWidget(parent),
+    geometries(0),
+    texture(0),
+    angularSpeed(0)
+{
+    timer = new QTimer(parent);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(fps);
+
 }
 
 MainWidget::~MainWidget()
@@ -144,7 +159,7 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    //timer.start(12, this);
 }
 
 //! [3]
@@ -204,10 +219,9 @@ void MainWidget::resizeGL(int w, int h)
 //! [5]
 
 void MainWidget::rotate() {
-    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+     QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
      rotationAxis = (rotationAxis * 1 + n).normalized();
      rotation = QQuaternion::fromAxisAndAngle(rotationAxis, 1) * rotation;
-     update();
 }
 
 void MainWidget::paintGL()

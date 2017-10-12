@@ -99,7 +99,7 @@ void GeometryEngine::initPlaneGeometry()
     int height = img.height(), width = img.width();
     int i_m = height / size, j_m = width / size;
 
-    std::cout << i_m << "," << j_m << std::endl;
+    //std::cout << i_m << "," << j_m << std::endl;
 
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
     VertexData vertices[size*size];

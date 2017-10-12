@@ -67,8 +67,30 @@ int main(int argc, char *argv[])
     app.setApplicationName("plane");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    //MainWidget widget;
+    //widget.show();
+
+    // 1 FPS
+    MainWidget widget2(1000);
+    app.setApplicationName("1 FPS");
+    widget2.show();
+
+    // 10 FPS
+
+    MainWidget widget3(100);
+    app.setApplicationName("10 FPS");
+    widget3.show();
+
+    //100 FPS
+    MainWidget widget4(10);
+    app.setApplicationName("100 FPS");
+    widget4.show();
+
+    //1000 FPS
+    MainWidget widget5(1);
+    app.setApplicationName("1000 FPS");
+    widget5.show();
+
 #else
     QLabel note("OpenGL Support required");
     note.show();

@@ -19,6 +19,8 @@ RESOURCES += \
     shaders.qrc \
     textures.qrc
 
+CONFIG += c++11
+
 # install
 target.path = .
 INSTALLS += target

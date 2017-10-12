@@ -64,7 +64,7 @@ MainWidget::MainWidget(QWidget *parent) :
     texture(0)
 {
     QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(rotate()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start();
 }
 
@@ -76,7 +76,6 @@ MainWidget::MainWidget(int fps, QWidget *parent) :
     timer = new QTimer(parent);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(fps);
-
 }
 
 MainWidget::~MainWidget()
@@ -199,7 +198,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/heightmap-1.png"));
+    texture = new QOpenGLTexture(QImage(":/labyrinthe.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);

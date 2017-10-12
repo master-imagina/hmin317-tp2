@@ -86,10 +86,10 @@ GeometryEngine::~GeometryEngine()
 
 void GeometryEngine::initPlaneGeometry()
 {
-    float taille_max = 1.5;
+    float taille_max = 2.5;
     QImage img;
 
-    if(!img.load(":/heightmap-1.png")) {
+    if(!img.load(":/labyrinthe.png")) {
         std::cerr << "ERREUR CHARGEMENT FICHIER HEIGHTMAP." << std::endl;
         return;
     }
@@ -104,17 +104,12 @@ void GeometryEngine::initPlaneGeometry()
     // Create array of 16 x 16 vertices facing the camera  (z=cte)
     VertexData vertices[size*size];
 
-    for (int i=0;i<size;i++)
-        for (int j=0;j<size;j++)
-            {
-                // Vertex data for face 0
-                vertices[size*i+j] = { QVector3D(0.1*(i-(size / 2.0)),0.1*(j-(size / 2.0)), (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max + 1.5), QVector2D((float)i/size,(float)j/size)};
-                // add height field eg (i-8)*(j-8)/256.0
-
-                //std::cout << "Position pixel : " << i_m * i << "," << j_m * j << std::endl;
-                //std::cout << "Valeur : " <<  (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max << std::endl;
+    for (int i=0;i<size;i++) {
+        for (int j=0;j<size;j++) {
+            vertices[size*i+j] = { QVector3D(0.1*(i-(size / 2.0)),0.1*(j-(size / 2.0)), (float) qGray(img.pixel(i_m * i, j_m * j)) / 255.0 * taille_max + 1.5),
+                                   QVector2D((float)i/size,(float)j/size)};
         }
-
+    }
 
     // Draw 15 bands each with 32 vertices, with repeated vertices at the end of each band
     int nb_vertices = size * 2 + 4;

@@ -62,6 +62,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QTimer>
+#include <QElapsedTimer>
 
 class GeometryEngine;
 
@@ -101,6 +102,7 @@ private:
     QQuaternion rotation;
 
     QTimer *timer;
+    QElapsedTimer elapsedTime;
 
     static float rotationSpeed;
 

@@ -52,6 +52,7 @@
 #include "speed.h"
 #include <iostream>
 
+#include <QElapsedTimer>
 #include <QMouseEvent>
 #include <Qtime>
 #include <math.h>
@@ -171,6 +172,8 @@ void MainWidget::initializeGL()
 
     // Use QBasicTimer because its faster than QTimer
     //timer.start(12, this);
+
+    elapsedTime.start();
 }
 
 //! [3]
@@ -232,7 +235,8 @@ void MainWidget::resizeGL(int w, int h)
 void MainWidget::rotate() {
      QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
      rotationAxis = (rotationAxis * 1 + n).normalized();
-     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, speedRotation) * rotation;
+     rotation = QQuaternion::fromAxisAndAngle(rotationAxis, speedRotation * elapsedTime.elapsed() * 0.01) * rotation;
+     elapsedTime.restart();
 }
 
 void MainWidget::paintGL()

@@ -4,7 +4,8 @@ TARGET = cube
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    camerafirst.cpp
+    camerafirst.cpp \
+    particulessystem.cpp
 
 INCLUDEPATH+= $$PWD/external/glm/
 
@@ -21,7 +22,8 @@ HEADERS += \
     camera.h\
     camerathird.h\
     utils.h \
-    camerafirst.h
+    camerafirst.h \
+    particulessystem.h
 
 RESOURCES += \
     shaders.qrc \

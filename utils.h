@@ -22,6 +22,7 @@ private:
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
     QOpenGLShaderProgram* heightGeneratorProgram;
+
     int m_nomberIndices;
 };
 

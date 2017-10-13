@@ -67,21 +67,17 @@ int main(int argc, char *argv[])
 
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    app.setApplicationName("60 FPS");
-    MainWidget widget60(1000/60);
-    widget60.show();
-    /*app.setApplicationName("1000 FPS");
-    MainWidget widget1000(1000/1000);
-    widget1000.show();
-    app.setApplicationName("100 FPS");
-    MainWidget widget100(1000/100);
-    widget100.show();
-    app.setApplicationName("10 FPS");
-    MainWidget widget10(1000/10);
-    widget10.show();
-    app.setApplicationName("1 FPS");
-    MainWidget widget1(1000/1);
-    widget1.show();*/
+    app.setApplicationName("Saison 1");
+    MainWidget widget1(1000/60,0),widget2(1000/60,90),widget3(1000/60,180),widget4(1000/60,270);
+    widget1.show();
+    /*widget2.show();
+    widget3.show();
+    widget4.show();*/
+    /*QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget2,SLOT(updateCalendar(int)));
+    QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget3,SLOT(updateCalendar(int)));
+    QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget4,SLOT(updateCalendar(int)));*/
+
+
 #else
     QLabel note("OpenGL Support required");
     note.show();

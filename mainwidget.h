@@ -74,7 +74,7 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(int msFramerate,QWidget *parent = 0);
+    explicit MainWidget(int msFramerate,int calendarOffset,QWidget *parent = 0);
     ~MainWidget();
 
 protected:
@@ -94,13 +94,22 @@ protected:
     void initTextures();
 
 public slots:
+    void updateCalendar(int calendar);
 
+signals:
+    void changedCalendar(int);
 
 private:
 
+    //Functions
+    QVector3D seasonalSkybox();
+    QVector3D QV3_Mix(float f, QVector3D a, QVector3D b);
 
-
+    //Members
+    int calendarOffset;
     QTimer * time;
+    QTime* elapse;
+    int calendar;
     QElapsedTimer elapsedTime;
     QOpenGLShaderProgram program;
 

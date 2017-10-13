@@ -58,7 +58,8 @@
 int MainWidget::keyPlusPressed =1;
 int MainWidget::keyMinusPressed =0;
 
-MainWidget::MainWidget(int msFramerate, QWidget *parent) :
+
+MainWidget::MainWidget(int msFramerate,int calendarOffset, QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
@@ -80,14 +81,16 @@ MainWidget::MainWidget(int msFramerate, QWidget *parent) :
     time = new QTimer;
     connect(time,SIGNAL(timeout()),this,SLOT(update()));
     time->start(msFramerate);
+    elapse = new QTime;
+    elapse->start();
     keyZPressed=0,keySPressed=0,keyQPressed=0,keyDPressed=0,keySpacePressed=0,keyMajPressed=0;
     this->setFocusPolicy(Qt::ClickFocus);
     this->setMouseTracking(true);
     dx_autoRotate = 0;
     paused = 0;
-
     elapsedTime.start();
-
+    this->calendarOffset = calendarOffset;
+    calendar =0;
 }
 
 MainWidget::~MainWidget()
@@ -255,7 +258,7 @@ void MainWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    glClearColor(0.2, 0.55, 1.0, 1);
+
 
     Utils u;
     texture = new QOpenGLTexture(u.generateHeightMap());
@@ -497,7 +500,46 @@ void MainWidget::initTextures()
     cliffDisp->setWrapMode(QOpenGLTexture::Repeat);
     cliffDisp->setAutoMipMapGenerationEnabled(true);
 }
+
+void MainWidget::updateCalendar(int calendar)
+{
+    this->calendar = (calendar+calendarOffset)%360;
+}
+
+QVector3D MainWidget::QV3_Mix(float f, QVector3D a, QVector3D b){
+    return b*f +  a*(1.0-f);
+}
+
+QVector3D MainWidget::seasonalSkybox()
+{
+    QVector3D winter(183/255.0,207/255.0,247/255.0);
+    QVector3D spring(0/255.0,161/255.0,255/255.0);
+    QVector3D summer(0/255.0,207/255.0,255/255.0);
+    QVector3D fall(211/255.0,142/255.0,57/255.0);
+
+    if(calendar<80){//Winter is
+        return winter;
+    }else if(calendar<100){
+        return QV3_Mix((calendar-80.0)/20.0,winter,spring);
+    }
+    else if(calendar<170){//Spring
+        return spring;
+    }else if(calendar<190){
+        return QV3_Mix((calendar-170.0)/20.0,spring,summer);
+    }
+    else if(calendar<260){//Summmer
+        return summer;
+    }else if(calendar<280){
+        return QV3_Mix((calendar-260.0)/20.0,summer,fall);
+    }
+    else if (calendar<340){//autommn
+        return fall;
+    }else{
+        return QV3_Mix((calendar-340)/20.0,fall,winter);
+    }
+}
 //! [4]
+
 
 //! [5]
 void MainWidget::resizeGL(int w, int h)
@@ -519,8 +561,16 @@ void MainWidget::resizeGL(int w, int h)
 void MainWidget::paintGL()
 {
 
-
     this->makeCurrent();
+    QVector3D colorSky = seasonalSkybox();
+    glClearColor(colorSky.x(), colorSky.y(), colorSky.z(), 1);
+
+    /*Incremente saison*/
+    if(calendarOffset==0){
+        calendar = (elapse->elapsed()*30/1000)%360;
+        emit changedCalendar(calendar);
+    }
+
     if(paused ){
         camera.move(dx,dy,wheelDelta,keyZPressed,keySPressed,keyQPressed,keyDPressed,keySpacePressed-keyMajPressed);
     }
@@ -573,6 +623,8 @@ void MainWidget::paintGL()
     program.setUniformValue("rockDisp",11);
     program.setUniformValue("cliffDisp",12);
 
+    program.setUniformValue("ambientColor",colorSky);
+    program.setUniformValue("calendar",calendar);
 
     // Draw cube geometry
     geometries->drawPlaneGeometry(&program);

@@ -46,7 +46,7 @@ void main(void){
                         gl_TessLevelOuter[2] = 0.0;
                 }else
                 {
-                        float t = 8.0;
+                        float t = 4.0;
                         float l0 = length(p1.xy - p2.xy) * t + 1.0; //Get size of edge to deduct level of tesselation
                         float l1 = length(p2.xy - p0.xy) * t + 1.0;
                         float l2 = length(p0.xy - p1.xy) * t + 1.0;

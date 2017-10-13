@@ -5,7 +5,8 @@
         <file>tcsShader.glsl</file>
         <file>tesShader.glsl</file>
         <file>heightGeneratorFragment.glsl</file>
-        <file>heightGeneratorVertex.glsl</file>
+        <file>simpleQuadVertex.glsl</file>
         <file>gShader.glsl</file>
+        <file>particleEngine.glsl</file>
     </qresource>
 </RCC>

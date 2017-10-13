@@ -34,7 +34,7 @@ QImage Utils::generateHeightMap()
 
     heightGeneratorProgram = new QOpenGLShaderProgram;
     // Compile vertex shader
-    heightGeneratorProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/heightGeneratorVertex.glsl");
+    heightGeneratorProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/simpleQuadVertex.glsl");
 
 
     // Compile fragment shader
@@ -65,6 +65,7 @@ QImage Utils::generateHeightMap()
     delete heightGeneratorProgram;
     return captureFBO->toImage();
 }
+
 
 struct VertexData
 {

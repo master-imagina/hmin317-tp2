@@ -2,6 +2,7 @@ QT       += core gui widgets
 
 TARGET = plane
 TEMPLATE = app
+CONFIG += c++11
 
 SOURCES += main.cpp
 
@@ -15,8 +16,12 @@ HEADERS += \
 
 RESOURCES += \
     shaders.qrc \
-    textures.qrc
+    textures.qrc \
+    images.qrc
 
 # install
 target.path = .
 INSTALLS += target
+
+DISTFILES += \
+    heightmap-11.png

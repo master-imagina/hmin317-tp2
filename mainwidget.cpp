@@ -13,7 +13,7 @@ MainWidget::MainWidget(QWidget *parent, int frame) :
     Framerate = frame;
 
     PosX = -5.0;
-    PosY = -5.0;
+    PosY = -15.0;
     PosZ = -15.0;
     for(int i = 0; i < 10; i++)
     {

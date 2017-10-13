@@ -69,13 +69,14 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(int fps, int &speed, QWidget *parent = 0);
     ~MainWidget();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void timerEvent(QTimerEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -90,6 +91,7 @@ private:
     GeometryEngine *geometries;
 
     QOpenGLTexture *texture;
+    QOpenGLTexture *textures[2];
 
     QMatrix4x4 projection;
 
@@ -97,6 +99,24 @@ private:
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+
+    QVector3D eyePosition;
+    QVector3D centerPosition;
+
+
+    int rotationSpeed;
+
+    QVector<QVector3D>  m_vertices;
+    int vertices_by_x;
+    int vertices_by_z;
+    int quads_by_x;
+    int quads_by_z;
+
+    bool turnRight;
+    bool turnLeft;
+    int frequence;
+
+    int& speed;
 };
 
 #endif // MAINWIDGET_H

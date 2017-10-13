@@ -1,0 +1,3 @@
+    Vertex Shader : C’est l’étape qui va nous permettre soit de valider les coordonnées de nos sommets, soit de les modifier. Cette étape prend un vertex à part pour travailler dessus. S’il y a 3 vertices (pour un triangle) alors le vertex shader sera exécuté 3 fois.
+
+    Fragment Shader (parfois appelé Pixel Shader) : C’est l’étape qui va définir la couleur de chaque pixel de la forme délimitée par les vertices. Par exemple, si vous avez défini un rectangle de 100 pixels par 50 pixels, alors le fragment shader se chargera de définir la couleur des 5000 pixels composant le rectangle.

@@ -71,7 +71,7 @@ GeometryEngine::GeometryEngine()
     indexBuf.create();
 
     // Highmap
-    heightmap = new QImage(":/heightmap-3.png");
+    heightmap = new QImage(":/heightmap-1.png");
     initPlaneGeometryByHeightmap(heightmap);
 }
 

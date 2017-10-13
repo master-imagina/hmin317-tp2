@@ -53,14 +53,22 @@
 #include <QMouseEvent>
 
 #include <math.h>
+#include <fstream>
+#include <iostream>
+#include <cstdlib>
 
-MainWidget::MainWidget(QWidget *parent) :
-    QOpenGLWidget(parent),
-    geometries(0),
-    texture(0),
-    angularSpeed(0)
-{
-}
+using namespace std;
+
+MainWidget::MainWidget(int fps, QWidget *parent) :
+     QOpenGLWidget(parent),
+     geometries(0),
+     texture(0),
+     angularSpeed(0.5),
+     rotationAxis(0.0, 0.0, 1),
+     fps(fps)
+ {
+    this->grabKeyboard();
+ }
 
 MainWidget::~MainWidget()
 {
@@ -72,6 +80,57 @@ MainWidget::~MainWidget()
     doneCurrent();
 }
 
+void MainWidget::keyPressEvent(QKeyEvent *e)
+{
+    int key = e->key();
+
+    /*if (key == Qt::Key_4) {e->accept(); imput[0] = true;}
+    if (key == Qt::Key_6) {e->accept(); imput[1] = true;}
+    if (key == Qt::Key_8) {e->accept(); imput[2] = true;}
+    if (key == Qt::Key_2) {e->accept(); imput[3] = true;}
+
+    if (key == Qt::Key_1) {e->accept(); imput[6] = true;}
+    if (key == Qt::Key_3) {e->accept(); imput[7] = true;}
+    if (key == Qt::Key_7) {e->accept(); imput[8] = true;}
+    if (key == Qt::Key_9) {e->accept(); imput[9] = true;}
+
+    if (key == Qt::Key_Plus) {e->accept(); imput[4] = true;}
+    if (key == Qt::Key_Minus) {e->accept(); imput[5] = true;}
+
+    if (key == Qt::Key_Left) if(imput[11] == false) {imput[11] = true;} else {imput[11] = false;}
+    if (key == Qt::Key_Right) if(imput[12] == false) {imput[12] = true;} else {imput[12] = false;}*/
+
+    if (key == Qt::Key_4) {e->accept(); projection.translate(-1,0,0); update();}
+    if (key == Qt::Key_6) {e->accept(); projection.translate(1,0,0); update();}
+    if (key == Qt::Key_8) {e->accept(); projection.translate(0,1,0); update();}
+    if (key == Qt::Key_2) {e->accept(); projection.translate(0,-1,0); update();}
+
+    if (key == Qt::Key_Plus) {e->accept(); angularSpeed +=1; update();}
+    if (key == Qt::Key_Minus) {e->accept(); angularSpeed -=1; update();}
+
+    update();
+}
+
+void MainWidget::keyReleaseEvent(QKeyEvent *e)
+{
+    /*int key = e->key();
+
+    if (key == Qt::Key_4) {e->accept(); imput[0] = false;}
+    if (key == Qt::Key_6) {e->accept(); imput[1] = false;}
+    if (key == Qt::Key_8) {e->accept(); imput[2] = false;}
+    if (key == Qt::Key_2) {e->accept(); imput[3] = false;}
+
+    if (key == Qt::Key_1) {e->accept(); imput[6] = false;}
+    if (key == Qt::Key_3) {e->accept(); imput[7] = false;}
+    if (key == Qt::Key_7) {e->accept(); imput[8] = false;}
+    if (key == Qt::Key_9) {e->accept(); imput[9] = false;}
+
+    if (key == Qt::Key_Plus) {e->accept(); imput[4] = false;}
+    if (key == Qt::Key_Minus) {e->accept(); imput[5] = false;}
+
+    update();*/
+}
+
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
@@ -81,20 +140,10 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    // Mouse release position - mouse press position
     QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
-
-    // Rotation axis along the z axis
-    //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
     QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
-
-    // Accelerate angular speed relative to the length of the mouse sweep
     qreal acc = diff.length() / 100.0;
-
-    // Calculate new rotation axis as weighted sum
     rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-
-    // Increase angular speed
     angularSpeed += acc;
 }
 //! [0]
@@ -102,19 +151,23 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
+    /*if (imput[0]) scanX += 1;
+    if (imput[1]) scanX -= 1;
 
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+    if (imput[2]) scanY -= 1;
+    if (imput[3]) scanY += 1;
 
-        // Request an update
-        update();
-    }
+    if (imput[4]) scanZ += 1;
+    if (imput[5]) scanZ -= 1;
+
+    if (imput[6]) {scanX += 1; scanY += 1;}
+    if (imput[7]) {scanX -= 1; scanY += 1;}
+    if (imput[8]) {scanX += 1; scanY -= 1;}
+    if (imput[9]) {scanX -= 1; scanY -= 1;}*/
+
+    rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+
+    update();
 }
 //! [1]
 
@@ -138,25 +191,18 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(1000/fps, this);
 }
 
 //! [3]
 void MainWidget::initShaders()
 {
-    // Compile vertex shader
     if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.glsl"))
         close();
-
-    // Compile fragment shader
     if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.glsl"))
         close();
-
-    // Link shader pipeline
     if (!program.link())
         close();
-
-    // Bind shader pipeline for use
     if (!program.bind())
         close();
 }
@@ -166,7 +212,10 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-1.jpg"));
+    scanX = 0;
+    scanY = 0;
+    scanZ = 0;
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -183,16 +232,9 @@ void MainWidget::initTextures()
 //! [5]
 void MainWidget::resizeGL(int w, int h)
 {
-    // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
-
-    // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
-
-    // Reset projection
+    const qreal zNear = 3.0, zFar = 500.0, fov = 90.0;
     projection.setToIdentity();
-
-    // Set perspective projection
     projection.perspective(fov, aspect, zNear, zFar);
 }
 //! [5]
@@ -208,19 +250,16 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(0, 0, -4.0);
 
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
-    matrix.rotate(framing);
-
-    matrix.translate(0.0, -1.8, 0.0);
+    //QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
+    matrix.rotate(rotation);
+    matrix.rotate(-45, 1, 0, 0);
 
     // QVector3D eye = QVector3D(0.0,0.5,-5.0);
     // QVector3D center = QVector3D(0.0,0.0,2.0);
     // QVector3D up = QVector3D(-1,0,0);
     // matrix.lookAt(eye,center,up);
-
-    matrix.rotate(rotation);
 
 
     // Set modelview-projection matrix

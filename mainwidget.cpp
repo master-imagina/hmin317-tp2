@@ -1,65 +1,24 @@
-/****************************************************************************
-**
-** Copyright (C) 2016 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the QtCore module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #include "mainwidget.h"
 
 #include <QMouseEvent>
 
 #include <math.h>
 
-MainWidget::MainWidget(QWidget *parent) :
+MainWidget::MainWidget(QWidget *parent, int frame) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
     angularSpeed(0)
 {
+    Framerate = frame;
+
+    PosX = -5.0;
+    PosY = -15.0;
+    PosZ = -15.0;
+    for(int i = 0; i < 10; i++)
+    {
+        Pression[i] = false;
+    }
 }
 
 MainWidget::~MainWidget()
@@ -85,8 +44,7 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
 
     // Rotation axis along the z axis
-    //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
 
     // Accelerate angular speed relative to the length of the mouse sweep
     qreal acc = diff.length() / 100.0;
@@ -97,24 +55,123 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     // Increase angular speed
     angularSpeed += acc;
 }
-//! [0]
 
-//! [1]
+void MainWidget::keyPressEvent(QKeyEvent *e)
+{
+    int key = e->key();
+
+    switch (key)
+    {
+        case Qt::Key_Z:
+            Pression[0] = true;
+            break;
+        case Qt::Key_S:
+            Pression[1] = true;
+            break;
+        case Qt::Key_Q:
+            Pression[2] = true;
+            break;
+        case Qt::Key_D:
+            Pression[3] = true;
+            break;
+        case Qt::Key_A:
+            Pression[4] = true;
+            break;
+        case Qt::Key_E:
+            Pression[5] = true;
+            break;
+        case Qt::Key_Minus:
+            Pression[6] = true;
+            break;
+        case Qt::Key_Plus:
+            Pression[7] = true;
+            break;
+        case Qt::Key_Escape:
+            exit(1);
+            break;
+    }
+    update();
+}
+
+void MainWidget::keyReleaseEvent(QKeyEvent *e)
+{
+    int key = e->key();
+
+    switch (key)
+    {
+        case Qt::Key_Z:
+            Pression[0] = false;
+            break;
+        case Qt::Key_S:
+            Pression[1] = false;
+            break;
+        case Qt::Key_Q:
+            Pression[2] = false;
+            break;
+        case Qt::Key_D:
+            Pression[3] = false;
+            break;
+        case Qt::Key_A:
+            Pression[4] = false;
+            break;
+        case Qt::Key_E:
+            Pression[5] = false;
+            break;
+        case Qt::Key_Minus:
+            Pression[6] = false;
+            break;
+        case Qt::Key_Plus:
+            Pression[7] = false;
+            break;
+    }
+    update();
+}
+
 void MainWidget::timerEvent(QTimerEvent *)
 {
     // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
+    //angularSpeed *= 0.8;
 
     // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
+   /* if (angularSpeed < 0.01)
         angularSpeed = 0.0;
-    } else {
+    else
+    {*/
         // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+        //rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
+        rotation = QQuaternion::fromAxisAndAngle(QVector3D(0.0, 0.0, 1.0), Vitesse) * rotation;
+    //}
+
+        if (Pression[0])
+            PosY -= 0.1;
+
+        if (Pression[1])
+            PosY += 0.1;
+
+        if (Pression[2])
+            PosX += 0.1;
+
+        if (Pression[3])
+            PosX -= 0.1;
+
+        if (Pression[4])
+            PosZ += 0.1;
+
+        if (Pression[5])
+            PosZ -= 0.1;
+
+        if (Pression[6])
+        {
+            if(Vitesse > 0)
+                Vitesse -= 0.01;
+        }
+
+        if (Pression[7])
+            Vitesse += 0.01;
+
 
         // Request an update
         update();
-    }
 }
 //! [1]
 
@@ -135,10 +192,10 @@ void MainWidget::initializeGL()
     glEnable(GL_CULL_FACE);
 //! [2]
 
-    geometries = new GeometryEngine;
+    geometries = new GeometryEngine();
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    timer.start(Framerate, this);
 }
 
 //! [3]
@@ -166,7 +223,7 @@ void MainWidget::initShaders()
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/heightmap-3.png"));
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -187,7 +244,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    const qreal zNear = 0.1, zFar = 1000.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -208,18 +265,10 @@ void MainWidget::paintGL()
     // Calculate model view transformation
     QMatrix4x4 matrix;
 
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(PosX, 0, PosY);
 
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
+    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0), -45.0);
     matrix.rotate(framing);
-
-    matrix.translate(0.0, -1.8, 0.0);
-
-    // QVector3D eye = QVector3D(0.0,0.5,-5.0);
-    // QVector3D center = QVector3D(0.0,0.0,2.0);
-    // QVector3D up = QVector3D(-1,0,0);
-    // matrix.lookAt(eye,center,up);
-
     matrix.rotate(rotation);
 
 

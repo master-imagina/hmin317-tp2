@@ -54,6 +54,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+#include <QtGui/QOpenGLTexture>
 
 class GeometryEngine : protected QOpenGLFunctions
 {
@@ -65,9 +66,12 @@ public:
 
 private:
     void initPlaneGeometry();
+    void initPlaneGeometryByHeightmap(QImage *heightmap);
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
+
+    QImage *heightmap;
 };
 
 #endif // GEOMETRYENGINE_H

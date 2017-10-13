@@ -64,11 +64,17 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("plane");
+    app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    MainWidget widget0(1);
+    MainWidget widget1(10);
+    MainWidget widget2(100);
+    MainWidget widget3(1000);
+    widget0.show();
+    widget1.show();
+    widget2.show();
+    widget3.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();

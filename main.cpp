@@ -58,17 +58,25 @@
 
 int main(int argc, char *argv[])
 {
+    int rotationSpeed = 1;
+
     QApplication app(argc, argv);
 
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("plane");
+    app.setApplicationName("cube");
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    MainWidget widget1(1, rotationSpeed);
+    widget1.show();
+    MainWidget widget2(10, rotationSpeed);
+    widget2.show();
+    MainWidget widget3(100, rotationSpeed);
+    widget3.show();
+    MainWidget widget4(1000, rotationSpeed);
+    widget4.show();
 #else
     QLabel note("OpenGL Support required");
     note.show();

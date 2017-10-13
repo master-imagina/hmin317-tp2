@@ -53,13 +53,25 @@
 #include <QMouseEvent>
 
 #include <math.h>
+#include <iostream>
 
-MainWidget::MainWidget(QWidget *parent) :
+using namespace std;
+
+
+
+MainWidget::MainWidget(int fps, int &speed, QWidget *parent) :
     QOpenGLWidget(parent),
     geometries(0),
     texture(0),
-    angularSpeed(0)
+    angularSpeed(0),
+    rotationSpeed(2),
+    speed(speed)
 {
+    frequence = fps;
+    cout << "frequence : " << frequence << endl;
+
+    turnRight = true;
+    turnLeft = false;
 }
 
 MainWidget::~MainWidget()
@@ -72,7 +84,6 @@ MainWidget::~MainWidget()
     doneCurrent();
 }
 
-//! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
     // Save mouse press position
@@ -84,9 +95,9 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     // Mouse release position - mouse press position
     QVector2D diff = QVector2D(e->localPos()) - mousePressPosition;
 
-    // Rotation axis along the z axis
-    //QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-    QVector3D n = QVector3D(0.0,0.0,1.0).normalized();
+    // Rotation axis is perpendicular to the mouse position difference
+    // vector
+    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
 
     // Accelerate angular speed relative to the length of the mouse sweep
     qreal acc = diff.length() / 100.0;
@@ -97,9 +108,57 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     // Increase angular speed
     angularSpeed += acc;
 }
-//! [0]
 
-//! [1]
+void MainWidget::keyPressEvent(QKeyEvent *event){
+    if (event->key()== Qt::Key_Z) {
+        projection.translate(0.0, 0.0, 0.2);
+        //projection.lookAt(eye, center, up);
+    }
+    if (event->key()== Qt::Key_S) {
+        projection.translate(0.0, 0.0, -0.2);
+    }
+    if (event->key()== Qt::Key_Q) {
+         projection.translate(0.2, 0.0, 0.0);
+       // projection.rotate(-5, 0, 1, 0);
+        //rotation = QQuaternion::fromAxisAndAngle(0, 1, 0, -5) * rotation;
+    }
+    if (event->key()== Qt::Key_D) {
+        projection.translate(-0.2, 0.0, 0.0);
+        //projection.rotate(5, 0, 1, 0);
+        //rotation = QQuaternion::fromAxisAndAngle(0, 1, 0, 5) * rotation;
+    }
+
+
+    if (event->key() == Qt::Key_Right){
+        if (turnRight == true)
+            turnRight = false;
+        else {
+            turnLeft = false;
+            turnRight = true;
+        }
+    }
+    if (event->key() == Qt::Key_Left){
+        if (turnLeft == true)
+            turnLeft = false;
+        else {
+            turnRight = false;
+            turnLeft = true;
+        }
+    }
+
+    if (event->key() == Qt::Key_Up){
+        speed += 2;
+        rotationSpeed +=2;
+    }
+    if (event->key() == Qt::Key_Down){
+        //if (rotationSpeed)
+        speed -= 2;
+        rotationSpeed -=2;
+    }
+
+    update();
+}
+
 void MainWidget::timerEvent(QTimerEvent *)
 {
     // Decrease angular speed (friction)
@@ -115,8 +174,18 @@ void MainWidget::timerEvent(QTimerEvent *)
         // Request an update
         update();
     }
+
+    if (turnRight == true){
+        rotation = QQuaternion::fromAxisAndAngle(0, 1, 1, speed)* rotation;
+       // rotation = QQuaternion::fromAxisAndAngle(0, 1, 1, rotationSpeed)* rotation;
+        update();
+    }
+    if (turnLeft == true){
+        rotation = QQuaternion::fromAxisAndAngle(0, 1, 1, -speed)* rotation;
+       // rotation = QQuaternion::fromAxisAndAngle(0, 1, 1, -rotationSpeed)* rotation;
+        update();
+    }
 }
-//! [1]
 
 void MainWidget::initializeGL()
 {
@@ -126,7 +195,6 @@ void MainWidget::initializeGL()
 
     initShaders();
     initTextures();
-
 //! [2]
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -138,10 +206,10 @@ void MainWidget::initializeGL()
     geometries = new GeometryEngine;
 
     // Use QBasicTimer because its faster than QTimer
-    timer.start(12, this);
+    //timer.start(12, this);
+    timer.start(1000/frequence, this);
 }
 
-//! [3]
 void MainWidget::initShaders()
 {
     // Compile vertex shader
@@ -160,13 +228,12 @@ void MainWidget::initShaders()
     if (!program.bind())
         close();
 }
-//! [3]
 
-//! [4]
 void MainWidget::initTextures()
 {
     // Load cube.png image
-    texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    //texture = new QOpenGLTexture(QImage(":/cube.png").mirrored());
+    texture = new QOpenGLTexture(QImage(":/grass.jpg").mirrored());
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -178,16 +245,15 @@ void MainWidget::initTextures()
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
     texture->setWrapMode(QOpenGLTexture::Repeat);
 }
-//! [4]
 
-//! [5]
 void MainWidget::resizeGL(int w, int h)
 {
     // Calculate aspect ratio
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
-    // Set near plane to 1.0, far plane to 10.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 10.0, fov = 45.0;
+    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
+    //const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 3.0, zFar = 100.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -195,7 +261,6 @@ void MainWidget::resizeGL(int w, int h)
     // Set perspective projection
     projection.perspective(fov, aspect, zNear, zFar);
 }
-//! [5]
 
 void MainWidget::paintGL()
 {
@@ -204,24 +269,21 @@ void MainWidget::paintGL()
 
     texture->bind();
 
-//! [6]
     // Calculate model view transformation
-    QMatrix4x4 matrix;
-
-    matrix.translate(0.0, 0.0, -5.0);
-
-    QQuaternion framing = QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),-45.0);
-    matrix.rotate(framing);
-
-    matrix.translate(0.0, -1.8, 0.0);
-
-    // QVector3D eye = QVector3D(0.0,0.5,-5.0);
-    // QVector3D center = QVector3D(0.0,0.0,2.0);
-    // QVector3D up = QVector3D(-1,0,0);
-    // matrix.lookAt(eye,center,up);
-
+  /*  QMatrix4x4 matrix;
+    //matrix.translate(0.0, 0.0, -40.0);
+    matrix.translate(0.0, -1.5, -15.0);
     matrix.rotate(rotation);
 
+    //matrix.rotate(180, 1, 0, 0);
+    matrix.rotate(90, 1, 0, 0);
+    matrix.translate(-16.0, -16.0, 0.0);*/
+
+    QMatrix4x4 matrix;
+    matrix.translate(0.0, 0.0, -5.0);
+    matrix.rotate(rotation);
+
+    matrix.rotate(-45, 1, 0, 0);
 
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", projection * matrix);

@@ -8,5 +8,7 @@
         <file>simpleQuadVertex.glsl</file>
         <file>gShader.glsl</file>
         <file>particleEngine.glsl</file>
+        <file>particleRenderVertex.glsl</file>
+        <file>particleRenderFragment.glsl</file>
     </qresource>
 </RCC>

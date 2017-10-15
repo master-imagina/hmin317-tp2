@@ -66,6 +66,8 @@
 #include <QTimer>
 #include <QTime>
 #include <QElapsedTimer>
+#include "particulessystem.h"
+#include "particlesrenderer.h"
 
 class GeometryEngine;
 
@@ -141,12 +143,15 @@ private:
     qreal angularSpeed;
     QQuaternion rotation;
     CameraThird camera;
-
+    ParticulesSystem particulesSystem;
+    ParticlesRenderer particlesRenderer;
 
     float dx,dy,wheelDelta;
     int keyZPressed,keySPressed,keyQPressed,keyDPressed,keySpacePressed,keyMajPressed;
     static int keyPlusPressed, keyMinusPressed;
     int paused;
+
+    bool GLHaveBeenInitialized;
 };
 
 #endif // MAINWIDGET_H

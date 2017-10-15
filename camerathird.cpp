@@ -32,7 +32,7 @@ void CameraThird::move(float dx, float dy, int dw, int z, int s, int q, int d, i
 
 
     float pitchChange = dy * 0.3f;
-    if(pitch - pitchChange >0 && pitch - pitchChange <90)
+    if(pitch - pitchChange >0 && pitch - pitchChange <89)
         pitch -= pitchChange;
     float angleChange = dx * 0.3f;
     angleAroundPivot -= angleChange;

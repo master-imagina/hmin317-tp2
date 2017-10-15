@@ -90,7 +90,8 @@ MainWidget::MainWidget(int msFramerate,int calendarOffset, QWidget *parent) :
     paused = 0;
     elapsedTime.start();
     this->calendarOffset = calendarOffset;
-    calendar =0;
+    calendar = 0;
+    GLHaveBeenInitialized = false;
 }
 
 MainWidget::~MainWidget()
@@ -98,9 +99,9 @@ MainWidget::~MainWidget()
     // Make sure the context is current when deleting the texture
     // and the buffers.
     makeCurrent();
-
+    particulesSystem.cleanUp();
     delete texture;
-    delete sand;
+   // delete sand;
     delete cliff;
     delete grass;
     delete rock;
@@ -296,9 +297,8 @@ void MainWidget::initializeGL()
     projection.perspective(fov, aspect, zNear, zFar);
     camera.setProjectionMatrix(projection);
 
-
-
-
+    particulesSystem.initParticuleSystem();
+    particlesRenderer.initParticuleRenderer();
 
 }
 
@@ -562,6 +562,14 @@ void MainWidget::paintGL()
 {
 
     this->makeCurrent();
+    QMatrix4x4 mvp = camera.getProjectionMatrix()*camera.getViewMatrix();
+    particulesSystem.proccessTextureParticles(texture);
+
+    glViewport(0, 0, this->width(), this->height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    particlesRenderer.renderParticles(particulesSystem.getParticlesTexture(),mvp);
+    program.bind();
     QVector3D colorSky = seasonalSkybox();
     glClearColor(colorSky.x(), colorSky.y(), colorSky.z(), 1);
 
@@ -582,7 +590,7 @@ void MainWidget::paintGL()
     dx=0,dy=0;
     wheelDelta = 0;
     // Clear color and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     texture->bind(0);
     sand->bind(1);
@@ -597,7 +605,7 @@ void MainWidget::paintGL()
     grassDisp->bind(10);
     rockDisp->bind(11);
     cliffDisp->bind(12);
-
+    particulesSystem.getExtraDataTexture()->bind(13);
 
 //! [6]
     // Calculate model view transformation
@@ -605,7 +613,7 @@ void MainWidget::paintGL()
     matrix.translate(0.0, 0.0, 0.0);
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix()*camera.getViewMatrix()  );
+    program.setUniformValue("mvp_matrix", mvp  );
 //! [6]
 
     // Use texture unit 0 which contains cube.png
@@ -622,6 +630,7 @@ void MainWidget::paintGL()
     program.setUniformValue("grassDisp",10);
     program.setUniformValue("rockDisp",11);
     program.setUniformValue("cliffDisp",12);
+    program.setUniformValue("snowMap",13);
 
     program.setUniformValue("ambientColor",colorSky);
     program.setUniformValue("calendar",calendar);

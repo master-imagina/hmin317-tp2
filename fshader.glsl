@@ -10,6 +10,7 @@ uniform sampler2D cliffNormal;
 uniform sampler2D sandNormal;
 uniform sampler2D grassNormal;
 uniform sampler2D rockNormal;
+uniform sampler2D snowMap;
 
 uniform vec3 ambientColor;
 uniform int calendar;
@@ -82,29 +83,29 @@ void main()
     float cliffMin = 0.4;
     float cliffMax = 0.7;
 
-   // Auto Cliff
-   if(cliffAmout < cliffMin)
-   {
+    // Auto Cliff
+    if(cliffAmout < cliffMin)
+    {
        blendAmount = cliffAmout / cliffMin;
        albedo = mix(albedo, texture2D(cliff,fs_in.v_texcoord*40.0), blendAmount);
        normalColor = mix(normalColor,normalize(texture2D(cliffNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),blendAmount);
-   }
+    }
 
-   if((cliffAmout < cliffMax) && (cliffAmout >=cliffMin))
-   {
+    if((cliffAmout < cliffMax) && (cliffAmout >=cliffMin))
+    {
        blendAmount = (cliffAmout - cliffMin) * (1.0 / (cliffMax - cliffMin));
        albedo = mix(texture2D(cliff,fs_in.v_texcoord*40.0), albedo, blendAmount);
        normalColor = normalize(texture2D(cliffNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0);
        normalColor = mix(normalize(texture2D(cliffNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0),normalColor,blendAmount);
-   }
+    }
 
-   if(cliffAmout >= cliffMax)
-   {
+    if(cliffAmout >= cliffMax)
+    {
        blendAmount=1.0;
        albedo = texture2D(cliff,fs_in.v_texcoord*40.0);
        normalColor = normalize(texture2D(cliffNormal,fs_in.v_texcoord*40).rgb * 2.0 - 1.0);
-   }
-   float snowFactor=0;
+    }
+    float snowFactor=0;
     if(calendar < 60){
         snowFactor = calendar/40.0;
     }else if (calendar <120){
@@ -113,22 +114,24 @@ void main()
     snowFactor *= fs_in.height+0.2;
 
 
-   float orientation = max(dot(fs_in.normal, vec3(0.0,1.0,0.0)),0.0);
-   snowFactor *= orientation;
-   if( snowFactor>0.0 ){
+    float orientation = max(dot(fs_in.normal, vec3(0.0,1.0,0.0)),0.0);
+    snowFactor *= orientation;
+    snowFactor = texture2D(snowMap,fs_in.v_texcoord).r;
+    if( snowFactor>0.0 ){
         albedo = mix(albedo,vec4(1.,1.,1.,1.0),snowFactor*2.0);
 
-        normalColor = mix(normalColor,vec3(0,-1,0),snowFactor*2.0);
-   }
-   float diffnormalMap = max(abs(dot(normalColor, fs_in.lightDir)), 0.0);
+        normalColor = mix(normalColor,vec3(0,-1,0),min(snowFactor*2.0,1.0));
+    }
+    float diffnormalMap = max(abs(dot(normalColor, fs_in.lightDir)), 0.0);
 
-   float gamma = 1.2;
-   vec3 color = albedo.rgb * diff * diffnormalMap + ambientColor/6.0;
+    float gamma = 1.2;
+    vec3 color = albedo.rgb * diff * diffnormalMap + ambientColor/6.0;
 
-   color = pow(color, vec3(1.0/gamma));
+    color = pow(color, vec3(1.0/gamma));
 
 
-   FragColor = fog(vec4(color,1.0));
+    FragColor = fog(vec4(color,1.0));
+
 
 }
 

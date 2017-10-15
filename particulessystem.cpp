@@ -1,37 +1,34 @@
 #include "particulessystem.h"
+#include <iostream>
+#include <time.h>
+
 
 ParticulesSystem::ParticulesSystem()
+    :indexBuf(QOpenGLBuffer::IndexBuffer),extraDataTexture(QOpenGLTexture::Target2D)
 {
 
 }
 
 void ParticulesSystem::initParticuleSystem()
 {
-    initializeOpenGLFunctions();
 
+    extraDataTexture.setFormat(QOpenGLTexture::RGBA16_UNorm);
+
+    initializeOpenGLFunctions();
     arrayBuf.create();
     indexBuf.create();
+
+
+
     generateQuad();
-}
-
-void ParticulesSystem::cleanUp()
-{
-    delete heightGeneratorProgram;
-}
 
 
-QImage ParticulesSystem::proccessTextureParticles()
-{
-
-
-
-    QOpenGLFramebufferObject  * captureFBO;
-
-    QOpenGLFramebufferObjectFormat format;
-    format.setSamples(4);
-    format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    format.setSamples(2);
+    format.setInternalTextureFormat(GL_RGB);
     captureFBO = new QOpenGLFramebufferObject (PARTICLE_MAX, PARTICLE_MAX,format);
+    captureFBO->addColorAttachment(PARTICLE_MAX, PARTICLE_MAX);
 
+    particuleTexture = NULL;
 
     particleProgram = new QOpenGLShaderProgram;
     // Compile vertex shader
@@ -45,10 +42,31 @@ QImage ParticulesSystem::proccessTextureParticles()
     // Link shader pipeline
     particleProgram->link();
 
+    /*particleRenderProgram = new QOpenGLShaderProgram;
+    // Compile vertex shader
+    particleRenderProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/particleRenderVertex.glsl");
 
-    // Bind shader pipeline for use
+
+
+    // Link shader pipeline
+    particleRenderProgram->link();*/
+
+}
+
+void ParticulesSystem::cleanUp()
+{
+    arrayBuf.destroy();
+    indexBuf.destroy();
+    //particlesArrayBuf.destroy();
+}
+
+
+void ParticulesSystem::proccessTextureParticles(QOpenGLTexture* heightMap)
+{
+
+
+
     particleProgram->bind();
-
 
 
 
@@ -58,14 +76,33 @@ QImage ParticulesSystem::proccessTextureParticles()
     glViewport(0, 0, PARTICLE_MAX, PARTICLE_MAX);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    renderQuad();
+    QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    f->glDrawBuffers(2, bufs);
+    renderQuad(heightMap);
     captureFBO->release();
 
+    if(particuleTexture!=NULL)
+        delete particuleTexture;
+
+    particuleTexture = new QOpenGLTexture(captureFBO->toImage(false,0));
 
 
-    particuleTexture = new QOpenGLTexture(captureFBO->toImage());
-    return captureFBO->toImage();
+    // Set nearest filtering mode for texture minification
+    particuleTexture->setMinificationFilter(QOpenGLTexture::Nearest);
+
+    // Set bilinear filtering mode for texture magnification
+    particuleTexture->setMagnificationFilter(QOpenGLTexture::Nearest);
+
+    extraDataTexture.destroy();
+    extraDataTexture.setData(captureFBO->toImage(false,1));
+
+    // Set nearest filtering mode for texture minification
+    extraDataTexture.setMinificationFilter(QOpenGLTexture::Linear);
+
+    // Set bilinear filtering mode for texture magnification
+    extraDataTexture.setMagnificationFilter(QOpenGLTexture::Linear);
+
 }
 
 
@@ -84,7 +121,7 @@ void ParticulesSystem::generateQuad()
     for(int i=0;i<gridSize;i++){
         for(int j=0;j<gridSize;j++){
 
-            vertices.push_back({QVector3D((double)(i*step)*2.0 - 1.0,double(j*step)*2.0 - 1.0,0.0f),QVector2D(0,0)});
+            vertices.push_back({QVector3D((double)(i*step)*2.0 - 1.0,double(j*step)*2.0 - 1.0,0.0f),QVector2D(i*step,j*step)});
         }
     }
 
@@ -121,12 +158,17 @@ void ParticulesSystem::generateQuad()
 
 }
 
-void ParticulesSystem::renderQuad()
+void ParticulesSystem::renderQuad(QOpenGLTexture *heightMap)
 {
+
     srand (time(NULL));
     arrayBuf.bind();
 
     indexBuf.bind();
+    if(particuleTexture)
+        particuleTexture->bind(0);
+    extraDataTexture.bind(1);
+    heightMap->bind(2);
 
     // Offset for position
     quintptr offset = 0;
@@ -143,9 +185,25 @@ void ParticulesSystem::renderQuad()
     particleProgram->enableAttributeArray(texcoordLocation);
     particleProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
     particleProgram->setUniformValue("resolution", QVector2D(PARTICLE_MAX,PARTICLE_MAX));
-
+    particleProgram->setUniformValue("gravityVector",QVector3D(0,0.0000000981,0));
+    particleProgram->setUniformValue("speed",1);
+    particleProgram->setUniformValue("windVector",QVector3D(0,0,0));
+    particleProgram->setUniformValue("particlesTex",0);
+    particleProgram->setUniformValue("extraTex",1);
+    particleProgram->setUniformValue("heightMap",2);
+    particleProgram->setUniformValue("randomParameter", (float)(rand() % 100)/100.0f);
     glDrawElements(GL_TRIANGLES, m_nomberIndices, GL_UNSIGNED_SHORT, 0);
 
-    arrayBuf.destroy();
-    indexBuf.destroy();
+
 }
+
+QOpenGLTexture *ParticulesSystem::getParticlesTexture()
+{
+    return particuleTexture;
+}
+
+QOpenGLTexture *ParticulesSystem::getExtraDataTexture()
+{
+    return &extraDataTexture;
+}
+

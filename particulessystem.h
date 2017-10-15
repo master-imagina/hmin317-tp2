@@ -7,8 +7,9 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFramebufferObjectFormat>
+#include <QOpenGLExtraFunctions>
 
-#define PARTICLE_MAX 512
+#define PARTICLE_MAX 256
 
 class ParticulesSystem: protected QOpenGLFunctions
 {
@@ -18,16 +19,29 @@ public:
     void initParticuleSystem();
     void cleanUp();
 
-    QImage proccessTextureParticles();
+    void proccessTextureParticles(QOpenGLTexture *heightMap);
     void generateQuad();
-    void renderQuad();
+    void renderQuad(QOpenGLTexture *heightMap);
+
+    QOpenGLTexture* getParticlesTexture();
+    QOpenGLTexture* getExtraDataTexture();
 
 private:
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
+
+    //QOpenGLBuffer particlesArrayBuf;
+
+    //QOpenGLShaderProgram* particleRenderProgram;
     QOpenGLShaderProgram* particleProgram;
+
     QOpenGLTexture* particuleTexture;
+    QOpenGLTexture extraDataTexture;
+    QOpenGLFramebufferObject  * captureFBO;
+    int m_nomberIndices;
+    QOpenGLFramebufferObjectFormat format;
 
 };
+
 
 #endif // PARTICULESSYSTEM_H

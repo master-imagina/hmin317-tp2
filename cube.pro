@@ -5,7 +5,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     camerafirst.cpp \
-    particulessystem.cpp
+    particulessystem.cpp \
+    particlesrenderer.cpp
 
 INCLUDEPATH+= $$PWD/external/glm/
 
@@ -23,7 +24,8 @@ HEADERS += \
     camerathird.h\
     utils.h \
     camerafirst.h \
-    particulessystem.h
+    particulessystem.h \
+    particlesrenderer.h
 
 RESOURCES += \
     shaders.qrc \

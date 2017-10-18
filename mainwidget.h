@@ -58,9 +58,17 @@
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
-#include <QBasicTimer>
+
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+#include "camerathird.h"
+#include "camerafirst.h"
+#include <QTimer>
+#include <QTime>
+#include <QElapsedTimer>
+#include "particulessystem.h"
+#include "particlesrenderer.h"
+#include "terraineffect.h"
 
 class GeometryEngine;
 
@@ -69,12 +77,16 @@ class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MainWidget(int msFramerate,int calendarOffset,QWidget *parent = 0);
     ~MainWidget();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent ( QWheelEvent * event );
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
     void timerEvent(QTimerEvent *e) override;
 
     void initializeGL() override;
@@ -84,19 +96,64 @@ protected:
     void initShaders();
     void initTextures();
 
+public slots:
+    void updateCalendar(int calendar);
+
+signals:
+    void changedCalendar(int);
+
 private:
-    QBasicTimer timer;
+
+    //Functions
+    QVector3D seasonalSkybox();
+    QVector3D QV3_Mix(float f, QVector3D a, QVector3D b);
+
+    //Members
+    int calendarOffset;
+    QTimer * time;
+    QTime* elapse;
+    int calendar;
+    QElapsedTimer elapsedTime;
     QOpenGLShaderProgram program;
+
     GeometryEngine *geometries;
+    float dx_autoRotate;
 
+    GLuint heightMapID;
     QOpenGLTexture *texture;
+    QOpenGLTexture *sand;
+    QOpenGLTexture *cliff;
+    QOpenGLTexture *grass;
+    QOpenGLTexture *rock;
 
-    QMatrix4x4 projection;
+    QOpenGLTexture *cliffNormal;
+    QOpenGLTexture *sandNormal;
+    QOpenGLTexture *grassNormal;
+    QOpenGLTexture *rockNormal;
 
+    QOpenGLTexture *sandDisp;
+    QOpenGLTexture *grassDisp;
+    QOpenGLTexture *rockDisp;
+    QOpenGLTexture *cliffDisp;
+
+    bool mouseHaveBeenPress;
+
+    QPoint anchor;
     QVector2D mousePressPosition;
     QVector3D rotationAxis;
     qreal angularSpeed;
     QQuaternion rotation;
+    CameraThird camera;
+    ParticulesSystem particulesSystem;
+    ParticlesRenderer particlesRenderer;
+    TerrainEffect terrainEffect;
+
+    float dx,dy,wheelDelta;
+    int keyZPressed,keySPressed,keyQPressed,keyDPressed,keySpacePressed,keyMajPressed;
+    static int keyPlusPressed, keyMinusPressed;
+    int paused;
+
+    bool GLHaveBeenInitialized;
 };
 
 #endif // MAINWIDGET_H

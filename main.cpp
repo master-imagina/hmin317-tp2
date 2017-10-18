@@ -61,14 +61,23 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QSurfaceFormat format;
-    format.setDepthBufferSize(24);
+    format.setDepthBufferSize(32);
     QSurfaceFormat::setDefaultFormat(format);
 
-    app.setApplicationName("plane");
+
     app.setApplicationVersion("0.1");
 #ifndef QT_NO_OPENGL
-    MainWidget widget;
-    widget.show();
+    app.setApplicationName("Saison 1");
+    MainWidget widget1(1000/60,0),widget2(1000/60,90),widget3(1000/60,180),widget4(1000/60,270);
+    widget1.show();
+    /*widget2.show();
+    widget3.show();
+    widget4.show();*/
+    /*QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget2,SLOT(updateCalendar(int)));
+    QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget3,SLOT(updateCalendar(int)));
+    QObject::connect(&widget1,SIGNAL(changedCalendar(int)),&widget4,SLOT(updateCalendar(int)));*/
+
+
 #else
     QLabel note("OpenGL Support required");
     note.show();

@@ -2,5 +2,14 @@
     <qresource prefix="/">
         <file>vshader.glsl</file>
         <file>fshader.glsl</file>
+        <file>tcsShader.glsl</file>
+        <file>tesShader.glsl</file>
+        <file>heightGeneratorFragment.glsl</file>
+        <file>simpleQuadVertex.glsl</file>
+        <file>gShader.glsl</file>
+        <file>particleEngine.glsl</file>
+        <file>particleRenderVertex.glsl</file>
+        <file>particleRenderFragment.glsl</file>
+        <file>terrainEffect.glsl</file>
     </qresource>
 </RCC>

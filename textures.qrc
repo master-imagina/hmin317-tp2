@@ -1,5 +1,16 @@
 <RCC>
     <qresource prefix="/">
-        <file>cube.png</file>
+        <file>cliff.png</file>
+        <file>grass.png</file>
+        <file>rock.png</file>
+        <file>sand.png</file>
+        <file>Normal.png</file>
+        <file>sandNormal.png</file>
+        <file>grassNormal.png</file>
+        <file>rockNormal.png</file>
+        <file>sandDisp.png</file>
+        <file>cliffDisp.png</file>
+        <file>grassDisp.png</file>
+        <file>rockDisp.png</file>
     </qresource>
 </RCC>

@@ -20,7 +20,7 @@ public:
     void cleanUp();
 
     void generateParticlesBuffer();
-    void renderParticles(QOpenGLTexture* particlesTex, QMatrix4x4 mvp);
+    void renderParticles(QOpenGLTexture* particlesTex, QMatrix4x4 mvp,float snowFactor);
 
 private:
 

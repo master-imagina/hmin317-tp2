@@ -99,9 +99,9 @@ MainWidget::~MainWidget()
     // Make sure the context is current when deleting the texture
     // and the buffers.
     makeCurrent();
-    particulesSystem.cleanUp();
+
     delete texture;
-   // delete sand;
+    delete sand;
     delete cliff;
     delete grass;
     delete rock;
@@ -114,6 +114,7 @@ MainWidget::~MainWidget()
     delete cliffDisp;
     delete sandDisp;
     delete rockDisp;
+    particulesSystem.cleanUp();
     doneCurrent();
 }
 
@@ -299,6 +300,7 @@ void MainWidget::initializeGL()
 
     particulesSystem.initParticuleSystem();
     particlesRenderer.initParticuleRenderer();
+    terrainEffect.initTerrainEffect();
 
 }
 
@@ -562,20 +564,33 @@ void MainWidget::paintGL()
 {
 
     this->makeCurrent();
+
+    float snowFactor=0;
+    if(calendar < 40){
+        snowFactor = calendar/40.0;
+    }else if (calendar <80){
+        snowFactor =(80.0-calendar)/40.0;
+    }
+
     QMatrix4x4 mvp = camera.getProjectionMatrix()*camera.getViewMatrix();
-    particulesSystem.proccessTextureParticles(texture);
+    if(calendar<170){
+        particulesSystem.proccessTextureParticles(texture,snowFactor);
+    }
+    terrainEffect.proccessTerrainEffect(particulesSystem.getParticlesTexture(),texture,calendar);
 
     glViewport(0, 0, this->width(), this->height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    particlesRenderer.renderParticles(particulesSystem.getParticlesTexture(),mvp);
+    if(calendar<170){
+        if(particulesSystem.getParticlesTexture())
+            particlesRenderer.renderParticles(particulesSystem.getParticlesTexture(),mvp,snowFactor);
+    }
     program.bind();
     QVector3D colorSky = seasonalSkybox();
     glClearColor(colorSky.x(), colorSky.y(), colorSky.z(), 1);
 
     /*Incremente saison*/
     if(calendarOffset==0){
-        calendar = (elapse->elapsed()*30/1000)%360;
+        calendar = (elapse->elapsed()*30/10000)%360;
         emit changedCalendar(calendar);
     }
 
@@ -605,7 +620,10 @@ void MainWidget::paintGL()
     grassDisp->bind(10);
     rockDisp->bind(11);
     cliffDisp->bind(12);
-    particulesSystem.getExtraDataTexture()->bind(13);
+    if(terrainEffect.getSnowMap())
+        terrainEffect.getSnowMap()->bind(13);
+    if(particulesSystem.getParticlesTexture())
+        particulesSystem.getParticlesTexture()->bind(14);
 
 //! [6]
     // Calculate model view transformation
@@ -631,6 +649,7 @@ void MainWidget::paintGL()
     program.setUniformValue("rockDisp",11);
     program.setUniformValue("cliffDisp",12);
     program.setUniformValue("snowMap",13);
+    program.setUniformValue("particlesMap",14);
 
     program.setUniformValue("ambientColor",colorSky);
     program.setUniformValue("calendar",calendar);

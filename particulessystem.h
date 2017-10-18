@@ -19,9 +19,9 @@ public:
     void initParticuleSystem();
     void cleanUp();
 
-    void proccessTextureParticles(QOpenGLTexture *heightMap);
+    void proccessTextureParticles(QOpenGLTexture *heightMap, float snowFactor);
     void generateQuad();
-    void renderQuad(QOpenGLTexture *heightMap);
+    void renderQuad(QOpenGLTexture *heightMap,float snowFactor);
 
     QOpenGLTexture* getParticlesTexture();
     QOpenGLTexture* getExtraDataTexture();
@@ -36,7 +36,7 @@ private:
     QOpenGLShaderProgram* particleProgram;
 
     QOpenGLTexture* particuleTexture;
-    QOpenGLTexture extraDataTexture;
+    QOpenGLTexture* extraDataTexture;
     QOpenGLFramebufferObject  * captureFBO;
     int m_nomberIndices;
     QOpenGLFramebufferObjectFormat format;

@@ -9,6 +9,8 @@ uniform vec3 gravityVector;
 uniform float speed;
 uniform vec3 windVector;
 uniform float randomParameter;
+uniform float particlesCount;
+uniform float particlesFactor;
 
 uniform vec2 resolution;
 
@@ -33,17 +35,20 @@ void main(){
 
     vec3 outParticule = particule;
 
-    if(particule.g <= height+(0.1/4.0) ){
-        extraData.r += 0.01;
+    if(particule.g <= height+(0.1/4.0) || extraData.g==1.0){
+        if(extraData.g != 0)
+            extraData.r += 0.01;
         //random position
-        outParticule = vec3(random(uv*20),1.0,random(uv));
-        extraData.g = random(uv);
+        outParticule = vec3( uv.x + uv.x/particlesCount - random(uv)/particlesCount,1.0, uv.y + uv.y/particlesCount - random(uv)/particlesCount);
+        extraData.g = (random(uv)+(1-particlesFactor)>0.5)?1.0:0.0;
     }else{
-        extraData.r -= 0.2;
+        extraData.r -= 0.0002;
         //outParticule.w = particule.w + 0.0001;
 
         //outParticule.rgb = particule.rgb ;// * speed + windVector;
-        outParticule.g -= 0.01;
+        outParticule.r +=  max(sin(outParticule.g*40)/(400.0)-random(uv),0.0);
+        if(extraData.g==0.0)
+            outParticule.g -= (random(uv)+0.4)/150.0;
     }
 
     FragColor = outParticule;

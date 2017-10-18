@@ -7,6 +7,8 @@ uniform mat4 mvp_matrix;
 uniform sampler2D texture;
 uniform float quantityVertices;
 uniform float timer;
+uniform sampler2D snowMap;
+uniform sampler2D particlesMap;
 
 
 in vec4 a_position;
@@ -19,6 +21,7 @@ out VS_OUT{
 
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }vs_out;
 
 
@@ -67,6 +70,11 @@ void main()
     vs_out.eye_coord = Peye.xyz;
     vs_out.world_coord = worldPosition.xyz;
     vs_out.lightDir = normalize(omniLightPos - worldPosition.xyz);
+    vs_out.snow = 0.0;
+
+
+    vs_out.snow = texture2D(snowMap,a_texcoord).r;
+
 
     // Pass texture coordinate to fragment shader
     // Value will be automatically interpolated to fragments inside polygon faces

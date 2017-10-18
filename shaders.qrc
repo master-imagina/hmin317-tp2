@@ -10,5 +10,6 @@
         <file>particleEngine.glsl</file>
         <file>particleRenderVertex.glsl</file>
         <file>particleRenderFragment.glsl</file>
+        <file>terrainEffect.glsl</file>
     </qresource>
 </RCC>

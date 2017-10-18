@@ -1,15 +1,15 @@
-#include "particulessystem.h"
+#include "terraineffect.h"
 #include <iostream>
 #include <time.h>
 
 
-ParticulesSystem::ParticulesSystem()
+TerrainEffect::TerrainEffect()
     :indexBuf(QOpenGLBuffer::IndexBuffer)
 {
 
 }
 
-void ParticulesSystem::initParticuleSystem()
+void TerrainEffect::initTerrainEffect()
 {
 
 
@@ -25,11 +25,10 @@ void ParticulesSystem::initParticuleSystem()
 
     format.setSamples(2);
     format.setInternalTextureFormat(GL_RGB);
-    captureFBO = new QOpenGLFramebufferObject (PARTICLE_MAX, PARTICLE_MAX,format);
-    captureFBO->addColorAttachment(PARTICLE_MAX, PARTICLE_MAX);
+    captureFBO = new QOpenGLFramebufferObject (256, 256,format);
 
-    particuleTexture = NULL;
-    extraDataTexture = NULL;
+
+    snowMap = NULL;
 
     particleProgram = new QOpenGLShaderProgram;
     // Compile vertex shader
@@ -37,7 +36,7 @@ void ParticulesSystem::initParticuleSystem()
 
 
     // Compile fragment shader
-    particleProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/particleEngine.glsl");
+    particleProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/terrainEffect.glsl");
 
 
     // Link shader pipeline
@@ -46,7 +45,7 @@ void ParticulesSystem::initParticuleSystem()
 
 }
 
-void ParticulesSystem::cleanUp()
+void TerrainEffect::cleanUp()
 {
 
     arrayBuf.destroy();
@@ -59,7 +58,7 @@ void ParticulesSystem::cleanUp()
 }
 
 
-void ParticulesSystem::proccessTextureParticles(QOpenGLTexture* heightMap,float snowFactor)
+void TerrainEffect::proccessTerrainEffect(QOpenGLTexture* particlesTexture,QOpenGLTexture* heightMap,int calendar)
 {
 
 
@@ -71,36 +70,26 @@ void ParticulesSystem::proccessTextureParticles(QOpenGLTexture* heightMap,float 
     captureFBO->bind();
 
 
-    glViewport(0, 0, PARTICLE_MAX, PARTICLE_MAX);
+    glViewport(0, 0, 256, 256);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    QOpenGLExtraFunctions *f = QOpenGLContext::currentContext()->extraFunctions();
-    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    f->glDrawBuffers(2, bufs);
-    renderQuad(heightMap,snowFactor);
+
+    renderQuad(particlesTexture,heightMap,calendar);
     captureFBO->release();
 
-    if(particuleTexture!=NULL)
-        delete particuleTexture;
+    if(snowMap!=NULL)
+        delete snowMap;
 
-    particuleTexture = new QOpenGLTexture(captureFBO->toImage(false,0));
+    snowMap = new QOpenGLTexture(captureFBO->toImage(false,0));
 
-
-    // Set nearest filtering mode for texture minification
-    particuleTexture->setMinificationFilter(QOpenGLTexture::Nearest);
-
-    // Set bilinear filtering mode for texture magnification
-    particuleTexture->setMagnificationFilter(QOpenGLTexture::Nearest);
-
-    if(extraDataTexture!=NULL)
-        delete extraDataTexture;
-    extraDataTexture = new QOpenGLTexture(captureFBO->toImage(false,1));
 
     // Set nearest filtering mode for texture minification
-    extraDataTexture->setMinificationFilter(QOpenGLTexture::Linear);
+    snowMap->setMinificationFilter(QOpenGLTexture::Nearest);
 
     // Set bilinear filtering mode for texture magnification
-    extraDataTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    snowMap->setMagnificationFilter(QOpenGLTexture::Nearest);
+
+
 
 }
 
@@ -111,7 +100,7 @@ struct VertexData
     QVector2D texCoord;
 };
 
-void ParticulesSystem::generateQuad()
+void TerrainEffect::generateQuad()
 {
 
     int gridSize = 2;
@@ -157,17 +146,17 @@ void ParticulesSystem::generateQuad()
 
 }
 
-void ParticulesSystem::renderQuad(QOpenGLTexture *heightMap,float snowFactor)
+void TerrainEffect::renderQuad(QOpenGLTexture *particlesTexture, QOpenGLTexture *heightMap,int calendar)
 {
 
     srand (time(NULL));
     arrayBuf.bind();
 
     indexBuf.bind();
-    if(particuleTexture)
-        particuleTexture->bind(0);
-    if(extraDataTexture)
-        extraDataTexture->bind(1);
+    if(particlesTexture)
+        particlesTexture->bind(0);
+    if(snowMap)
+        snowMap->bind(1);
     heightMap->bind(2);
 
     // Offset for position
@@ -184,28 +173,18 @@ void ParticulesSystem::renderQuad(QOpenGLTexture *heightMap,float snowFactor)
     int texcoordLocation = particleProgram->attributeLocation("a_texcoord");
     particleProgram->enableAttributeArray(texcoordLocation);
     particleProgram->setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
-    particleProgram->setUniformValue("resolution", QVector2D(PARTICLE_MAX,PARTICLE_MAX));
-    particleProgram->setUniformValue("gravityVector",QVector3D(0,0.0000000981,0));
-    particleProgram->setUniformValue("speed",1);
-    particleProgram->setUniformValue("windVector",QVector3D(0,0,0));
     particleProgram->setUniformValue("particlesTex",0);
-    particleProgram->setUniformValue("extraTex",1);
+    particleProgram->setUniformValue("snowMap",1);
     particleProgram->setUniformValue("heightMap",2);
-    particleProgram->setUniformValue("particlesFactor",snowFactor);
-    particleProgram->setUniformValue("randomParameter", (float)(rand() % 100)/100.0f);
-    particleProgram->setUniformValue("particlesCount", (float)PARTICLE_MAX);
+    particleProgram->setUniformValue("calendar",calendar);
     glDrawElements(GL_TRIANGLES, m_nomberIndices, GL_UNSIGNED_SHORT, 0);
 
 
 }
 
-QOpenGLTexture *ParticulesSystem::getParticlesTexture()
+QOpenGLTexture *TerrainEffect::getSnowMap()
 {
-    return particuleTexture;
+    return snowMap;
 }
 
-QOpenGLTexture *ParticulesSystem::getExtraDataTexture()
-{
-    return extraDataTexture;
-}
 

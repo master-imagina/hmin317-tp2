@@ -10,6 +10,7 @@ in VS_OUT{
 
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }tcs_in[];
 
 out TCS_OUT
@@ -21,6 +22,7 @@ out TCS_OUT
 
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }tcs_out[];
 
 
@@ -81,4 +83,5 @@ void main(void){
         tcs_out[gl_InvocationID].height = tcs_in[gl_InvocationID].height;
         tcs_out[gl_InvocationID].eye_coord = tcs_in[gl_InvocationID].eye_coord;
         tcs_out[gl_InvocationID].world_coord = tcs_in[gl_InvocationID].world_coord;
+        tcs_out[gl_InvocationID].snow = tcs_in[gl_InvocationID].snow;
 }

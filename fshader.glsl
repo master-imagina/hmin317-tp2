@@ -11,6 +11,7 @@ uniform sampler2D sandNormal;
 uniform sampler2D grassNormal;
 uniform sampler2D rockNormal;
 uniform sampler2D snowMap;
+uniform sampler2D particlesMap;
 
 uniform vec3 ambientColor;
 uniform int calendar;
@@ -22,6 +23,7 @@ in TES_OUT{
     float height;
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }fs_in;
 
 out vec4 FragColor;
@@ -116,7 +118,7 @@ void main()
 
     float orientation = max(dot(fs_in.normal, vec3(0.0,1.0,0.0)),0.0);
     snowFactor *= orientation;
-    snowFactor = texture2D(snowMap,fs_in.v_texcoord).r;
+    snowFactor = fs_in.snow;
     if( snowFactor>0.0 ){
         albedo = mix(albedo,vec4(1.,1.,1.,1.0),snowFactor*2.0);
 
@@ -131,6 +133,7 @@ void main()
 
 
     FragColor = fog(vec4(color,1.0));
+
 
 
 }

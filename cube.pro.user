@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.1, 2017-10-15T01:58:00. -->
+<!-- Written by QtCreator 4.2.1, 2017-10-18T22:38:34. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -122,7 +122,7 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:/Users/C17/Documents/GitHub/Error in &quot; Util.asciify(&quot;build-cube-Desktop_Qt_5_8_0_MSVC2015_64bit-Release&quot;)&quot;: TypeError: Property 'asciify' of object Core::Internal::UtilsJsExtension(0x5c36118) is not a function</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:/Users/C17/Documents/GitHub/Error in &quot; Util.asciify(&quot;build-cube-Desktop_Qt_5_8_0_MSVC2015_64bit-Release&quot;)&quot;: TypeError: Property 'asciify' of object Core::Internal::UtilsJsExtension(0x4dc38e0) is not a function</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -176,7 +176,7 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:/Users/C17/Documents/GitHub/Error in &quot; Util.asciify(&quot;build-cube-Desktop_Qt_5_8_0_MSVC2015_64bit-Profile&quot;)&quot;: TypeError: Property 'asciify' of object Core::Internal::UtilsJsExtension(0x5c36118) is not a function</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:/Users/C17/Documents/GitHub/Error in &quot; Util.asciify(&quot;build-cube-Desktop_Qt_5_8_0_MSVC2015_64bit-Profile&quot;)&quot;: TypeError: Property 'asciify' of object Core::Internal::UtilsJsExtension(0x4dc38e0) is not a function</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>

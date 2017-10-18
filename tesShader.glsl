@@ -18,7 +18,6 @@ uniform sampler2D grassDisp;
 uniform sampler2D rockDisp;
 uniform sampler2D cliffDisp;
 
-uniform sampler2D snowMap;
 
 uniform mat4 mvp_matrix;
 
@@ -31,6 +30,7 @@ in TCS_OUT
 
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }tes_in[];
 
 out TES_OUT
@@ -42,6 +42,7 @@ out TES_OUT
 
     vec3 eye_coord;
     vec3 world_coord;
+    float snow;
 }tess_out;
 
 // ----------------------------------------------------------------------------
@@ -109,7 +110,8 @@ void main(void){
         {
            h = texture2D(cliffDisp,tess_out.v_texcoord*40.0).r*0.8;
         }
-        h += texture2D(snowMap,tess_out.v_texcoord).r;
+        tess_out.snow = interpolate(tes_in[0].snow, tes_in[1].snow, tes_in[2].snow);
+        h += tess_out.snow;
 
         vec3 p = interpolate(tes_in[0].world_coord, tes_in[1].world_coord, tes_in[2].world_coord);
         p += h * tess_out.normal;

@@ -68,6 +68,7 @@
 #include <QElapsedTimer>
 #include "particulessystem.h"
 #include "particlesrenderer.h"
+#include "terraineffect.h"
 
 class GeometryEngine;
 
@@ -145,6 +146,7 @@ private:
     CameraThird camera;
     ParticulesSystem particulesSystem;
     ParticlesRenderer particlesRenderer;
+    TerrainEffect terrainEffect;
 
     float dx,dy,wheelDelta;
     int keyZPressed,keySPressed,keyQPressed,keyDPressed,keySpacePressed,keyMajPressed;

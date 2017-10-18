@@ -45,7 +45,7 @@ void ParticlesRenderer::generateParticlesBuffer()
     indexBuf.allocate(&indices[0], indices.size() * sizeof(GLushort));
 }
 
-void ParticlesRenderer::renderParticles(QOpenGLTexture *particlesTex, QMatrix4x4 mvp)
+void ParticlesRenderer::renderParticles(QOpenGLTexture *particlesTex, QMatrix4x4 mvp, float snowFactor)
 {
     glEnable(GL_PROGRAM_POINT_SIZE_EXT);
     glPointSize(10);
